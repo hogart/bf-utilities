@@ -1,4 +1,15 @@
 {
+  "name": "bf-utilities",
+  "private": true,
+  "author": {
+    "name": "Konstantin Kitmanov",
+    "email": "me@kitmanov.name",
+    "url": "https://kitmanov.name"
+  },
+  "homepage": "https://github.com/hogart/bf-utilities",
+  "description": "Various utilities for Black Flag Roleplaying System: party sheet, currency management, XP and currency reward",
+  "license": "MIT",
+
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^12.331.1-beta",
     "@types/jquery": "^3.5.32",

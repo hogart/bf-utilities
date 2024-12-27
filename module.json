@@ -1,7 +1,7 @@
 {
   "id": "bf-utilities",
   "title": "BlackFlag Roleplaying utils",
-  "description": "Various utilities for Black Flag Roleplaying System",
+  "description": "Various utilities for Black Flag Roleplaying System: party sheet, currency management, XP and currency reward",
   "authors": [
     {
       "name": "Konstantin Kitmanov",
@@ -10,6 +10,12 @@
       "discord": "hogart"
     }
   ],
+  "url": "https://github.com/hogart/bf-utilities",
+  "bugs": "https://github.com/hogart/bf-utilities/issues",
+  "readme": "./readme.md",
+  "license": "./license.txt",
+
+  "manifest": "https://raw.githubusercontent.com/hogart/bf-utilities/trunk/module.json",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "12",
@@ -20,9 +26,6 @@
   ],
   "styles": [
     "styles/bf-utilities.css"
-  ],
-  "templates": [
-
   ],
   "flags": {
     "hotReload": {
@@ -40,12 +43,15 @@
       ]
     }
   },
+  "system": ["black-flag"],
   "relationships": {
     "systems": [
       {
         "id": "black-flag",
         "type": "system",
-        "compatibility": {}
+        "compatibility": {
+          "minimum": "1.1.057"
+        }
       }
     ]
   }
