@@ -1,0 +1,22 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create ZIP
+        run: zip -r bf-utilities.zip . -x ".git/*,node_modules/*,.husky/*,.github/*,tests/*,.editorconfig,eslint.config.mjs,foundry-types.d.ts,package-lock.json,tsconfig.json,types.d.ts"
+
+      - name: Upload Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: my-awesome-module.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
