@@ -1,0 +1,52 @@
+{
+  "id": "bf-utilities",
+  "title": "BlackFlag Roleplaying utils",
+  "description": "Various utilities for Black Flag Roleplaying System",
+  "authors": [
+    {
+      "name": "Konstantin Kitmanov",
+      "url": "https://kitmanov.name",
+      "email": "me@kitmanov.name",
+      "discord": "hogart"
+    }
+  ],
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "esmodules": [
+    "scripts/index.mjs"
+  ],
+  "styles": [
+    "styles/bf-utilities.css"
+  ],
+  "templates": [
+
+  ],
+  "flags": {
+    "hotReload": {
+      "extensions": [
+        "mjs",
+        "js",
+        "json",
+        "css",
+        "hbs"
+      ],
+      "paths": [
+        "styles",
+        "scripts",
+        "templates"
+      ]
+    }
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "black-flag",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,274 @@
+.bf-utilities-form {
+  margin-bottom: 1rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    &.character {
+      flex-direction: row;
+      gap: 1ch;
+      align-items: center;
+
+      img {
+        height: 2.5rem;
+        border: 0 none;
+      }
+    }
+  }
+
+  select {
+    height: var(--form-field-height);
+    width: 100%;
+  }
+
+  .remove-creature-btn {
+    flex-grow: 0;
+    height: var(--form-field-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 0;
+  }
+
+  .creature-group {
+    gap: 1ch;
+
+    label:has(button) {
+      flex: 1;
+    }
+  }
+
+  .distribute-methods {
+    flex-direction: column;
+    align-items: start;
+
+    label {
+      flex-direction: row;
+      gap: 1ch;
+    }
+  }
+
+  .currency-input {
+    label {
+      flex-direction: row;
+      flex: 1;
+      align-items: center;
+      gap: 1ch;
+    }
+    input {
+      flex: 1;
+    }
+    img {
+      height: 1.2rem;
+    }
+  }
+}
+
+.party-sheet {
+  .actions {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+
+    border-bottom: 1px solid var(--bf-color-border-blue);
+    padding-bottom: 1ch;
+    margin-bottom: 1rem;
+
+    button {
+      width: auto;
+    }
+  }
+
+  .pc-items {
+    padding-left: 0;
+  }
+
+  .pc-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    border: 1px solid var(--bf-color-border-blue);
+    padding: 1ch;
+  }
+
+  .pc-portrait {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+    flex-shrink: 0;
+
+    img {
+      max-height: 5rem;
+      object-fit: cover;
+      cursor: pointer;
+      border: 0 none;
+      margin-bottom: -1ch;
+    }
+
+    meter {
+      height: 2rem;
+      width: 100%;
+      position: relative;
+
+      &::after {
+        content: attr(data-display);
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: center;
+        font-size: 0.7rem;
+        color: black;
+        text-shadow: 0 0 2px silver;
+      }
+    }
+
+    .protection {
+      display: flex;
+      flex-direction: row;
+      gap: 1ch;
+      font-size: 0.7rem;
+      margin-top: -1ch;
+
+      span {
+        flex: 1;
+      }
+    }
+
+    .portrait-wrapper {
+      position: relative;
+
+      .marker {
+        position: absolute;
+
+        > i {
+          text-shadow: 0 0 1px gray;
+        }
+      }
+
+      .senses {
+        left: 0;
+        top: 0;
+      }
+
+      .movement {
+        right: 0;
+        top: 0;
+      }
+
+      .size {
+        left: 0;
+        bottom: 0;
+      }
+
+      .type {
+        right: 0;
+        bottom: 0;
+      }
+    }
+
+  }
+
+  .pc-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1ch;
+    flex-grow: 1;
+  }
+
+  .pc-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+
+    .name {
+      display: block;
+      font-size: 125%;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .character-skills {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1ch;
+    font-size: 10px;
+    padding-left: 0;
+    border-top: 1px solid var(--bf-color-border-blue);
+    border-bottom: 1px solid var(--bf-color-border-blue);
+  }
+
+  .character-classes {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    a.compendium {
+      &:not(:last-child)::after {
+        content: ','
+      }
+    }
+  }
+
+  .misc {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .origin {
+    font-size: 85%;
+    opacity: 0.75;
+  }
+
+  a.compendium {
+    display: inline-flex;
+    align-items: center;
+
+    img {
+      height: 1.2rem;
+      margin-right: 1ch;
+    }
+  }
+}
+
+.currency-management {
+  label:has(input[type="radio"]) {
+    flex-direction: row;
+
+    input[type="radio"] {
+      flex-grow: 0;
+    }
+  }
+
+  .transfer {
+    display: none;
+  }
+
+  &:has(input[value="transfer"]:checked) {
+    .transfer {
+      display: block;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 1ch;
+    flex-direction: row;
+    margin-top: 1rem;
+
+    button {
+      width: auto;
+      justify-content: flex-end;
+    }
+  }
+}

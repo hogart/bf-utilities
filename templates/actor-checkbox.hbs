@@ -1,0 +1,7 @@
+<div class="form-group">
+  <label class="character">
+    <input type="{{ifThen radio "radio" "checkbox"}}" name="actors" value="{{actor.id}}" {{ifThen radio "" "checked"}}/>
+    <img src="{{actor.img}}" alt="{{actor.name}}"/>
+    {{actor.name}}
+  </label>
+</div>

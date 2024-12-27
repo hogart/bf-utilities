@@ -1,0 +1,118 @@
+<div class="party-sheet">
+  {{#if isGM}}
+    <div class="actions">
+      <button data-action="distribute-currency">
+        <i class="fas fa-coins"></i>
+        Distribute currency
+      </button>
+
+      <button data-action="grant-xp">
+        <i class="fa-solid fa-arrow-down-up-across-line"></i>
+        Grant XP
+      </button>
+    </div>
+  {{/if}}
+  <ul class="pc-items">
+    {{#each actors}}
+      <li class="pc-item">
+        <div class="pc-portrait">
+          <div class="portrait-wrapper">
+            <img src="{{img}}" alt="{{name}}" data-open-sheet="{{@index}}"/>
+
+            {{#if senses}}
+              <div class="marker senses" title="{{senses}}">
+                <i class="fa-solid fa-eye"></i>
+              </div>
+            {{/if}}
+
+            {{#if type}}
+              <span class="marker type" title="{{type}}">
+                <i class="fa-solid fa-person"></i>
+              </span>
+            {{/if}}
+
+            {{#if size}}
+              <span class="marker size" title="{{size}}">
+                <i class="fa-solid fa-ruler"></i>
+              </span>
+            {{/if}}
+
+            {{#if movement}}
+              <span class="marker movement" title="{{movement}}">
+                <i class="fa-solid fa-feather"></i>
+              </span>
+            {{/if}}
+          </div>
+
+          <meter
+            max="{{hp.max}}"
+            value="{{hp.value}}"
+            data-display="{{hp.value}}{{#if hp.thp}}+{{hp.thp}}{{/if}}/{{hp.max}}"
+          ></meter>
+
+          <div class="protection">
+            <span title="AC: {{ac.label}}">
+              <i class="fas fa-shield-halved"></i>
+              {{ac.value}}
+            </span>
+            <span title="Hit Dice">
+              <i class="fas fa-campground"></i>
+              {{hd.available}}/{{hd.max}}
+            </span>
+          </div>
+        </div>
+        <div class="pc-info">
+          <div class="pc-header">
+            <a class="name" data-open-sheet="{{@index}}">{{name}}</c>
+
+            <p class="character-classes">
+              {{#each classes}}
+                <a data-open-item="{{_id}}" data-actor-index="{{@index}}" class="compendium">
+                  <img src="{{img}}" alt="{{name}}"/>
+                  {{name}}
+                  {{levels}}
+                </a>
+              {{/each}}
+            </p>
+          </div>
+
+          <div class="origin">
+            <a data-open-item="{{heritage._id}}" data-actor-index="{{@index}}" class="compendium">
+              {{heritage.name}}
+            </a>
+            <a data-open-item="{{lineage._id}}" data-actor-index="{{@index}}" class="compendium">
+              {{lineage.name}}
+            </a>,
+            <a data-open-item="{{background._id}}" data-actor-index="{{@index}}" class="compendium">
+              {{background.name}}
+            </a>
+          </div>
+
+          <ul class="character-skills">
+            {{#each highestSkills}}
+              <li>
+                {{localize label}}
+                {{mod}}
+              </li>
+            {{/each}}
+          </ul>
+
+          <div class="misc">
+            <span title="Luck">
+              <i class="fas fa-clover"></i>
+              {{luck}}
+            </span>
+            <span title="Attuned Items">
+              <i class="fa-solid fa-sun"></i>
+              {{attunement.value}}/{{attunement.max}}
+            </span>
+            <span title="Wealth">
+              <i class="fas fa-coins"></i>
+              {{coinage}}
+            </span>
+          </div>
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+</div>

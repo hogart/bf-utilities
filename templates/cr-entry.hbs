@@ -1,0 +1,24 @@
+<div class="form-group creature-group">
+  <label>
+    CR:
+    <select name="cr">
+      {{#each xpTable}}
+        <option
+          value="{{ xp }}"
+        >
+          {{ cr }} ({{ xp }})
+        </option>
+      {{/each}}
+    </select>
+  </label>
+  <label>
+    Quantity:
+    <input type="number" name="quantity" min="1" value="1"/>
+  </label>
+  <label>
+    &nbsp;
+    <button type="button" class="remove-creature-btn" title="Remove the creature">
+      <i class="fas fa-trash"></i>
+    </button>
+  </label>
+</div>

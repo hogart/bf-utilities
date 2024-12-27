@@ -1,0 +1,34 @@
+<form class="bf-utilities-form">
+  <fieldset>
+    <legend>How much XP?</legend>
+
+    <div class="form-group">
+      <label for="plainXp">
+        Plain XP:
+        <input type="number" name="plainXp" value="0" step="1"/>
+      </label>
+    </div>
+
+    <div id="creature-section">
+      {{> cr_entry xpTable=xpTable}}
+    </div>
+    <button type="button" class="add-creature-btn">
+      <i class="fas fa-add"></i>
+      Add creature
+    </button>
+  </fieldset>
+
+  <fieldset>
+    <legend>To this characters:</legend>
+    {{#each actors}}
+      {{> actor_checkbox actor=this}}
+    {{/each}}
+  </fieldset>
+  <fieldset>
+    <legend>Log entry (isn't displayed currently)</legend>
+    <div class="form-group">
+      <label for="entry">Entry:</label>
+      <input type="text" name="source"/>
+    </div>
+  </fieldset>
+</form>

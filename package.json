@@ -1,0 +1,21 @@
+{
+  "devDependencies": {
+    "@league-of-foundry-developers/foundry-vtt-types": "^12.331.1-beta",
+    "@types/jquery": "^3.5.32",
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
+    "ava": "^6.2.0",
+    "eslint": "^9.14.0",
+    "husky": "^9.1.7",
+    "typescript": "^5.6.3"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "ava tests/**/*.test.mjs",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm  test",
+    "prepare": "husky"
+  }
+}

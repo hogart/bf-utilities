@@ -1,0 +1,39 @@
+<form class="bf-utilities-form">
+  <fieldset>
+    <legend>How much money?</legend>
+    {{#each currencies}}
+      {{> currency_input currency=this}}
+    {{/each}}
+  </fieldset>
+  <fieldset>
+    <legend>Distribute between:</legend>
+    {{#each actors}}
+      {{> actor_checkbox actor=this}}
+    {{/each}}
+  </fieldset>
+  <fieldset>
+    <legend>Method</legend>
+    <div class="form-group distribute-methods">
+      <label
+        data-tooltip="
+          Entire sum will be exchanged to highest possible denomination and distributed evenly.
+          Overflow coppers may fall to first few people. This works in cities.
+        "
+      >
+        <input name="method" type="radio" value="exchange" checked/>
+        With access to exchange service
+      </label>
+      <label
+        data-tooltip="
+          Each denomination will be evenly divided separately.
+          The rest will be exchanged and then distributed, as if with the access to exchange.
+          This is intended for wilderness.
+        "
+      >
+        <input name="method" type="radio" value="wilderness"/>
+        No exchange service available
+      </label>
+    </div>
+  </fieldset>
+  <p>Use negative values if you need characters to spend money.</p>
+</form>

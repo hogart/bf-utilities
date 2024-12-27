@@ -1,0 +1,40 @@
+<form class="currency-management bf-utilities-form">
+  <fieldset>
+    <legend>How much money?</legend>
+
+    {{#each currencies}}
+      {{> currency_input currency=this}}
+    {{/each}}
+  </fieldset>
+
+  <fieldset>
+    <legend>Transaction type</legend>
+
+    <label>
+      <input name="transaction" type="radio" value="receive" checked/>
+      Receive
+    </label>
+
+    <label>
+      <input name="transaction" type="radio" value="spend"/>
+      Spend
+    </label>
+
+    <label>
+      <input name="transaction" type="radio" value="transfer"/>
+      Transfer
+    </label>
+  </fieldset>
+
+  <fieldset class="transfer">
+    <legend>Transfer to:</legend>
+
+    {{#each fellows}}
+      {{> actor_checkbox actor=this radio=true}}
+    {{/each}}
+  </fieldset>
+
+  <div class="actions">
+    <button type="submit">Confirm</button>
+  </div>
+</form>
