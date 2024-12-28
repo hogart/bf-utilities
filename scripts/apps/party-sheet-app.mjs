@@ -1,9 +1,10 @@
 import { distributeCurrency } from '../dialogs/distribute-currency.mjs';
 import { grantXp } from '../dialogs/grant-xp.mjs';
 import { getActorCoinage } from '../lib/actor-currency.mjs';
-import { coinageToStrings } from '../lib/currency.mjs';
+import { coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
 import { firstToUpper } from '../lib/first-to-upper.mjs';
 import { getPath } from '../lib/tpl.mjs';
+import { CurrencyManagementApp } from './currency-management-app.mjs';
 
 // @ts-expect-error wrong typings?
 export class PartySheetApp extends Application {
@@ -57,6 +58,8 @@ export class PartySheetApp extends Application {
       };
     });
 
+    const coinageAndWealth = await this.#actorCoinageAndWealth(actor);
+
     return {
       _id: actor._id,
       img: actor.img,
@@ -83,23 +86,28 @@ export class PartySheetApp extends Application {
       background: actor.system.progression.background,
       heritage: actor.system.progression.heritage,
       lineage: actor.system.progression.lineage,
-      coinage: await this.#actorCoinage(actor),
+      ...coinageAndWealth,
       senses: actor.system.traits.senses.label ? actor.system.traits.senses.label : null,
       type: actor.system.traits.type.label !== 'Humanoid' ? actor.system.traits.type.label : null,
       size: actor.system.traits.size !== 'medium' ? firstToUpper(actor.system.traits.size) : null,
       movement: actor.system.traits.movement.labels,
+
+      isOwner: actor.id === game.user?.character?.id,
     };
   }
 
   /**
    * @param {BlackFlagActor} actor
-   * @returns {Promise<string>}
+   * @returns {Promise<{coinage: string, wealth: string,}>}
    */
-  async #actorCoinage(actor) {
+  async #actorCoinageAndWealth(actor) {
     const coinage = await getActorCoinage(actor);
     const chunks = coinageToStrings(coinage);
 
-    return chunks.join(', ');
+    return {
+      coinage: chunks.join(', '),
+      wealth: coinageToWealth(coinage),
+    };
   }
 
   async getData() {
@@ -114,7 +122,7 @@ export class PartySheetApp extends Application {
             continue;
           }
 
-          if (skill.mod <= otherActor.skills[skillIndex].mod) {
+          if (skill.mod < otherActor.skills[skillIndex].mod) {
             hasHigher = true;
           }
         }
@@ -181,6 +189,33 @@ export class PartySheetApp extends Application {
         grantXp(this.actors);
       }
     });
+
+    html.on('click', '[data-remove-luck]', (event) => {
+      if (!game.user?.isGM) {
+        return;
+      }
+      const actor = this.actors[event.currentTarget.dataset.removeLuck];
+      const currentLuck = actor.system.attributes.luck.value;
+      if (currentLuck > 0) {
+        actor.update({system: {attributes: {luck: {value: currentLuck - 1}}}});
+      }
+    });
+
+    html.on('click', '[data-grant-luck]', (event) => {
+      if (!game.user?.isGM) {
+        return;
+      }
+      const actor = this.actors[event.currentTarget.dataset.grantLuck];
+      const currentLuck = actor.system.attributes.luck.value;
+      if (currentLuck < CONFIG.BlackFlag.luck.max) {
+        actor.system.addLuck();
+      }
+    });
+
+    html.on('click', '[data-manage-currency]', (event) => {
+      const actor = this.actors[event.currentTarget.dataset.manageCurrency];
+      CurrencyManagementApp.showApp({actor});
+    });
   }
 
   registerHooks() {
@@ -199,5 +234,17 @@ export class PartySheetApp extends Application {
         }
       });
     }
+  }
+
+  /**
+   * @param {{ actors: BlackFlagActor[]; folderId?: string; }} params
+   * @returns {Promise<PartySheetApp>}
+   */
+  static async showApp(params) {
+    const app = new PartySheetApp(params);
+    app.render(true);
+    app.registerHooks();
+
+    return app;
   }
 }

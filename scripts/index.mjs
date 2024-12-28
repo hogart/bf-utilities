@@ -2,7 +2,6 @@ import { grantXp } from './dialogs/grant-xp.mjs';
 import { distributeCurrency } from './dialogs/distribute-currency.mjs';
 import { MODULE_ID } from './lib/module-id.mjs';
 import { getPcActors } from './lib/actor.mjs';
-import { registerPartial } from './lib/tpl.mjs';
 import { isPc } from './lib/utils.mjs';
 import { PartySheetApp } from './apps/party-sheet-app.mjs';
 import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
@@ -18,8 +17,15 @@ function injectModuleApi() {
     const api = {
       grantXp,
       distributeCurrency,
-      showPartySheet(actors = getPcActors()) {
-        return new PartySheetApp({actors});
+      async showPartySheet(actors = getPcActors()) {
+        return PartySheetApp.showApp({actors});
+      },
+      async showCurrencyManagement(actor = game.user?.character) {
+        if (actor) {
+          return CurrencyManagementApp.showApp({actor: /** @type BlackFlagActor */(actor)});
+        } else {
+          ui.notifications?.error('No character provided');
+        }
       },
     };
 
@@ -49,10 +55,7 @@ async function injectCurrencyButton(_app, $html, _data) {
   );
 
   $currencyManagement.on('click', async () => {
-    await registerPartial('currency-input');
-    await registerPartial('actor-checkbox');
-    const app = new CurrencyManagementApp({actor: _data.actor, isOwner: _data.owner});
-    app.render(true);
+    CurrencyManagementApp.showApp({actor: _data.actor});
   });
 
   targetCell.append($currencyManagement);
@@ -99,9 +102,7 @@ function injectPartySheetButton(_app, $html) {
       event.stopImmediatePropagation();
       // @ts-expect-error wrong typings?
       const actors = folder.contents.filter(isPc);
-      const app = new PartySheetApp({actors, folderId: folder._id});
-      app.render(true);
-      app.registerHooks();
+      PartySheetApp.showApp({actors, folderId: folder._id});
     });
   });
 }

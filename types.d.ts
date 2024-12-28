@@ -78,6 +78,8 @@ declare global {
           mod: number,
         }>,
       },
+
+      addLuck: () => Promise<void>,
     },
   }
 
@@ -127,10 +129,13 @@ declare global {
     heritage: BlackFlagActor['system']['progression']['heritage'],
     lineage: BlackFlagActor['system']['progression']['lineage'],
     coinage: string,
+    wealth: string,
     senses: BlackFlagActor['system']['progression']['traits']['senses']['label'] | null,
     type: BlackFlagActor['system']['progression']['traits']['type']['label'] | null,
     size: BlackFlagActor['system']['progression']['traits']['size'] | null,
     movement: BlackFlagActor['system']['progression']['traits']['movement']['labels'],
+
+    isOwner: boolean,
   }
 
   interface PCSheetData {
@@ -152,5 +157,13 @@ declare global {
     gp: number,
     sp: number,
     cp: number,
+  }
+
+  interface CONFIG {
+    BlackFlag: {
+      luck: {
+        max: number;
+      };
+    };
   }
 }

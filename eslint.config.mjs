@@ -35,6 +35,7 @@ export default [
           Handlebars: 'readonly',
           canvas: 'readonly',
           Application: 'readonly',
+          CONFIG: 'readonly',
         },
         $: 'readonly',
       },

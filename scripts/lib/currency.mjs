@@ -134,6 +134,24 @@ export function coinageToStrings(coinage) {
 }
 
 /**
+ * @param {Coinage} coinage
+ * @returns {string}
+ */
+export function coinageToWealth(coinage) {
+  const total = _totalInCopper(coinage.pp, coinage.gp, coinage.sp, coinage.cp);
+
+  if (total >= 1000) {
+    return (total / 1000).toFixed(2) + ' pp';
+  } else if (total >= 100) {
+    return (total / 100).toFixed(2) + ' gp';
+  } else if (total >= 10) {
+    return (total / 10).toFixed(2) + ' sp';
+  } else {
+    return total + ' cp';
+  }
+}
+
+/**
  * @param {string} name
  * @param {Coinage} coinage
  * @returns {string}
@@ -159,7 +177,6 @@ export class NotEnoughMoneyError extends RangeError {
 }
 
 /**
- *
  * @param {Coinage} actorCoinage
  * @param {Coinage} toSpend
  * @return {Coinage}

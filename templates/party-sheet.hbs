@@ -1,4 +1,4 @@
-<div class="party-sheet">
+<div class="party-sheet {{#if isGM}}isGM{{/if}}">
   {{#if isGM}}
     <div class="actions">
       <button data-action="distribute-currency">
@@ -14,7 +14,7 @@
   {{/if}}
   <ul class="pc-items">
     {{#each actors}}
-      <li class="pc-item">
+      <li class="pc-item {{#if isOwner}}isOwner{{/if}}">
         <div class="pc-portrait">
           <div class="portrait-wrapper">
             <img src="{{img}}" alt="{{name}}" data-open-sheet="{{@index}}"/>
@@ -98,17 +98,25 @@
           </ul>
 
           <div class="misc">
-            <span title="Luck">
+            <span title="Luck" class="luck">
+              <a data-remove-luck="{{@index}}" title="Remove luck point" class="gm-only owner-only">
+                <i class="fas fa-minus"></i>
+              </a>
               <i class="fas fa-clover"></i>
               {{luck}}
+              <a data-grant-luck="{{@index}}" title="Add luck point" class="gm-only owner-only">
+                <i class="fas fa-plus"></i>
+              </a>
             </span>
             <span title="Attuned Items">
               <i class="fa-solid fa-sun"></i>
               {{attunement.value}}/{{attunement.max}}
             </span>
-            <span title="Wealth">
-              <i class="fas fa-coins"></i>
-              {{coinage}}
+            <span title="Wealth: {{coinage}}">
+              <a data-manage-currency="{{@index}}" class="luck {{#if isOwner}}active{{/if}} {{#if @root.isGM}}active{{/if}}">
+                <i class="fas fa-coins"></i>
+              </a>
+              {{wealth}}
             </span>
           </div>
         </div>

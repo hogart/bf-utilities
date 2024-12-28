@@ -100,8 +100,8 @@
     flex-shrink: 0;
 
     img {
-      width: 5rem;
-      height: 5rem;
+      width: 6rem;
+      height: 6rem;
       object-fit: contain;
       cursor: pointer;
       border: 0 none;
@@ -129,13 +129,9 @@
     .protection {
       display: flex;
       flex-direction: row;
-      gap: 1ch;
       font-size: 0.7rem;
       margin-top: -1ch;
-
-      span {
-        flex: 1;
-      }
+      justify-content: space-between;
     }
 
     .portrait-wrapper {
@@ -183,11 +179,11 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 2rem;
+    justify-content: space-between;
 
     .name {
       display: block;
-      font-size: 125%;
+      font-size: 150%;
     }
 
     p {
@@ -201,11 +197,14 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 1ch;
     font-size: 10px;
     padding-left: 0;
     border-top: 1px solid var(--bf-color-border-blue);
     border-bottom: 1px solid var(--bf-color-border-blue);
+
+    li:has(+ li) {
+      margin-right: 1ch;
+    }
   }
 
   .character-classes {
@@ -224,6 +223,14 @@
     display: flex;
     flex-direction: row;
     gap: 1rem;
+
+    .luck {
+      pointer-events: none;
+
+      &.active {
+        pointer-events: auto;
+      }
+    }
   }
 
   .origin {
@@ -239,6 +246,16 @@
       height: 1.2rem;
       margin-right: 1ch;
     }
+  }
+
+  .owner-only,
+  .gm-only {
+    display: none;
+  }
+
+  &.isGM .gm-only,
+  .isOwner .owner-only {
+    display: unset;
   }
 }
 
