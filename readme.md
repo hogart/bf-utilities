@@ -4,9 +4,9 @@ BlackFlag Roleplaying system utilities for Foundry. Written in typed JS.
 
 ## Installation
 
-Copy and paste this url into the Manifest URL input in Install Module window in your Foundry instance:
+Copy and paste this url into the *Manifest URL* input in *Install Module* window in your Foundry instance:
 
-`https://raw.githubusercontent.com/hogart/bf-utilities/trunk/module.json`
+`https://github.com/hogart/bf-utilities/releases/latest/download/module.json`
 
 ## Features
 

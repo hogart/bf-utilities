@@ -15,8 +15,8 @@
   "readme": "./readme.md",
   "license": "./license.txt",
 
-  "manifest": "https://raw.githubusercontent.com/hogart/bf-utilities/trunk/module.json",
-  "download": "https://raw.githubusercontent.com/hogart/bf-utilities/archive/refs/heads/trunk.zip",
+  "manifest": "https://github.com/hogart/bf-utilities/releases/latest/download/module.json",
+  "download": "https://github.com/hogart/bf-utilities/releases/latest/download/bf-utilities.zip",
   "version": "1.0.0",
   "compatibility": {
     "minimum": "12",
