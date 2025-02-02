@@ -20,10 +20,12 @@
       Spend
     </label>
 
+    {{#if isGM}}
     <label>
       <input name="transaction" type="radio" value="transfer"/>
       Transfer
     </label>
+    {{/if}}
   </fieldset>
 
   <fieldset class="transfer">

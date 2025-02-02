@@ -117,6 +117,7 @@ export class CurrencyManagementApp extends Application {
           id: actor.id,
           name: actor.name,
           img: actor.img,
+          isGM: !!game.user?.isGM,
         };
       }),
     };
