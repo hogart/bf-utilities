@@ -16,6 +16,7 @@ declare global {
           value: number,
           label: string,
         },
+        cr?: number,
         attunement: {
           max: number,
           value: number,

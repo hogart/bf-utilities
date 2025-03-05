@@ -2,9 +2,11 @@
   <label>
     CR:
     <select name="cr">
+      <option>—</option>
       {{#each xpTable}}
         <option
           value="{{ xp }}"
+          {{#if (eq cr ../creatureCr)}}selected{{/if}}
         >
           {{ cr }} ({{ xp }})
         </option>
@@ -13,7 +15,7 @@
   </label>
   <label>
     Quantity:
-    <input type="number" name="quantity" min="1" value="1"/>
+    <input type="number" name="quantity" min="1" value="{{ creatureCount }}"/>
   </label>
   <label>
     &nbsp;

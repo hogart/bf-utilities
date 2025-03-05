@@ -1,6 +1,7 @@
 import { notifyActorOwner } from '../lib/utils.mjs';
 import { getPath, registerPartial, render } from '../lib/tpl.mjs';
 import { getPcActors, getSelectedActors } from '../lib/actor.mjs';
+import { canvasToXp } from '../lib/canvas-to-xp.mjs';
 
 const xpTable = [
   { cr: '0', xp: 10 },
@@ -39,15 +40,22 @@ const xpTable = [
   { cr: '30', xp: 155000 },
 ];
 
-export async function grantXp(actors = getPcActors()) {
+/**
+ *
+ * @param {BlackFlagActor[]} actors
+ * @param {{cr: string, count: number}[]} battleFieldXp
+ * @returns {Promise<Dialog>}
+ */
+export async function grantXp(actors = getPcActors(true), battleFieldXp = []) {
   await registerPartial('actor-checkbox');
   await registerPartial('cr-entry');
   loadTemplates([
     getPath('grant-xp'),
   ]);
 
-  const content = await render('grant-xp', {actors, xpTable});
+  const content = await render('grant-xp', {actors, xpTable, battleFieldXp});
 
+  // @ts-expect-error wrong typings?
   return new Dialog({
     'title': 'Grant XP',
     'content': content,
@@ -131,4 +139,15 @@ async function assignXp(xp, selectedActors, source = 'Grant XP Macro') {
 
     notifyActorOwner(actor, `${actor.name} has been granted ${xp} XP. New total: ${newXP}`);
   }
+}
+
+export async function grantXpAfterBattle() {
+  let actors = getPcActors(true);
+  if (!actors.length) {
+    ui.notifications?.warn('No PC tokens on the scene, using all available actors');
+    actors = getPcActors();
+  }
+
+  const xp = canvasToXp();
+  grantXp(actors, xp);
 }

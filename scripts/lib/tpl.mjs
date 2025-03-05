@@ -15,6 +15,15 @@ export function getPath(template) {
  * @returns {Promise<string>}
  */
 export async function render(template, ctx) {
+  Handlebars.registerHelper('eqeqeq', function(a, b) {
+    return a === b;
+  });
+  Handlebars.registerHelper('eq', function(a, b) {
+    return a == b;
+  });
+  Handlebars.registerHelper('neq', function(a, b) {
+    return a != b;
+  });
   return await renderTemplate(getPath(template), {MODULE_ID, ...ctx});
 }
 

@@ -1,10 +1,11 @@
-import { grantXp } from './dialogs/grant-xp.mjs';
+import { grantXp, grantXpAfterBattle } from './dialogs/grant-xp.mjs';
 import { distributeCurrency } from './dialogs/distribute-currency.mjs';
 import { MODULE_ID } from './lib/module-id.mjs';
 import { getPcActors } from './lib/actor.mjs';
 import { isPc } from './lib/utils.mjs';
 import { PartySheetApp } from './apps/party-sheet-app.mjs';
 import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
+import { registerSettings, getSetting, SHOW_PARTY_SHEET_BUTTON, SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET, SHOW_XP_AFTER_BATTLE } from './lib/settings.mjs';
 
 function injectModuleApi() {
   if (!MODULE_ID) {
@@ -17,7 +18,7 @@ function injectModuleApi() {
     const api = {
       grantXp,
       distributeCurrency,
-      async showPartySheet(actors = getPcActors()) {
+      async showPartySheet(actors = getPcActors(true)) {
         return PartySheetApp.showApp({actors});
       },
       async showCurrencyManagement(actor = game.user?.character) {
@@ -27,6 +28,7 @@ function injectModuleApi() {
           ui.notifications?.error('No character provided');
         }
       },
+      grantXpAfterBattle,
     };
 
     Object.assign(module, {api});
@@ -39,7 +41,11 @@ function injectModuleApi() {
  * @param {PCSheetData} _data
  */
 async function injectCurrencyButton(_app, $html, _data) {
-  if (!_data.owner && !game.user?.isGM) {
+  if (/** @type number*/(getSetting(SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET)) > (game.user?.role ?? 1)) {
+    return;
+  }
+
+  if (!_data.owner) {
     return;
   }
 
@@ -66,6 +72,10 @@ async function injectCurrencyButton(_app, $html, _data) {
  * @param {JQuery<HTMLElement>} $html
  */
 function injectPartySheetButton(_app, $html) {
+  if (/** @type number*/(getSetting(SHOW_PARTY_SHEET_BUTTON)) > (game.user?.role ?? 1)) {
+    return;
+  }
+
   $html.find('.folder').each((_index, folderElement) => {
     const folderId = folderElement.dataset.folderId;
     if (!folderId) {
@@ -107,6 +117,14 @@ function injectPartySheetButton(_app, $html) {
   });
 }
 
+function onDeleteCombat() {
+  if (getSetting(SHOW_XP_AFTER_BATTLE)) {
+    grantXpAfterBattle();
+  }
+}
+
 Hooks.on('init', injectModuleApi);
+Hooks.once('init', registerSettings);
 Hooks.on('renderPCSheet', injectCurrencyButton);
 Hooks.on('renderActorDirectory', injectPartySheetButton);
+Hooks.on('deleteCombat', onDeleteCombat);

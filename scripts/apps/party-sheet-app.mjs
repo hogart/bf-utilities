@@ -1,8 +1,10 @@
 import { distributeCurrency } from '../dialogs/distribute-currency.mjs';
 import { grantXp } from '../dialogs/grant-xp.mjs';
 import { getActorCoinage } from '../lib/actor-currency.mjs';
+import { moduleBus } from '../lib/module-bus.mjs';
 import { coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
 import { firstToUpper } from '../lib/first-to-upper.mjs';
+import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
 import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
 
@@ -17,6 +19,11 @@ export class PartySheetApp extends Application {
     this.actors = params.actors;
     this.folderId = params.folderId;
   }
+
+  /**
+   * @type Array<() => void>
+   */
+  #unsubscribers = [];
 
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions || {}, {
@@ -151,6 +158,8 @@ export class PartySheetApp extends Application {
     return {
       isGM: !!game.user?.isGM,
       actors,
+      enableGrantXp: getSetting(SHOW_GRANT_XP_BUTTON),
+      enableDistributeCurrency: getSetting(SHOW_DISTRIBUTE_CURRENCY_BUTTON),
     };
   }
 
@@ -216,6 +225,29 @@ export class PartySheetApp extends Application {
       const actor = this.actors[event.currentTarget.dataset.manageCurrency];
       CurrencyManagementApp.showApp({actor});
     });
+
+    this.#unsubscribers.push(
+      moduleBus.listenSettingChange(SHOW_GRANT_XP_BUTTON, (newValue) => {
+        html.toggleClass('enable-grant-xp', /** @type boolean */(newValue));
+      }),
+    );
+
+    this.#unsubscribers.push(
+      moduleBus.listenSettingChange(SHOW_DISTRIBUTE_CURRENCY_BUTTON, (newValue) => {
+        html.toggleClass('enable-distribute-currency', /** @type boolean */(newValue));
+      }),
+    );
+  }
+
+  /**
+   * @param {Application.CloseOptions} _options
+   */
+  async close(_options) {
+    for (const unsubscribe of this.#unsubscribers) {
+      unsubscribe();
+    }
+
+    return super.close(_options);
   }
 
   registerHooks() {

@@ -4,7 +4,7 @@ import { getPath, registerPartial, render } from '../lib/tpl.mjs';
 import { getPcActors, getSelectedActors } from '../lib/actor.mjs';
 import { currencyList, upsertActorCoinage } from '../lib/actor-currency.mjs';
 
-export async function distributeCurrency(actors = getPcActors()) {
+export async function distributeCurrency(actors = getPcActors(true)) {
   await registerPartial('actor-checkbox');
   await registerPartial('currency-input');
   loadTemplates([

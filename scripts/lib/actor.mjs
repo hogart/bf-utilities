@@ -3,7 +3,20 @@ import { isPc } from './utils.mjs';
 /**
  * @returns BlackFlagActor[]
  */
-export function getPcActors() {
+export function getPcActors(fromCanvasOnly = false) {
+  if (fromCanvasOnly) {
+    return canvas?.scene?.tokens.contents.reduce(
+      (acc, token) => {
+        const actor = /** @type BlackFlagActor|null */(token.actor);
+        if (actor && isPc(actor)) {
+          acc.push(actor);
+        }
+
+        return acc;
+      },
+      /** @type BlackFlagActor[] */([]),
+    ) ?? [];
+  }
   const actors = /** @type BlackFlagActor[]|undefined */(game.actors);
   return actors?.filter(isPc) || [];
 }
