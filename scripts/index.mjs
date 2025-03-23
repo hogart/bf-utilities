@@ -118,7 +118,7 @@ function injectPartySheetButton(_app, $html) {
 }
 
 function onDeleteCombat() {
-  if (getSetting(SHOW_XP_AFTER_BATTLE)) {
+  if (getSetting(SHOW_XP_AFTER_BATTLE) && game.user?.isGM) {
     grantXpAfterBattle();
   }
 }
