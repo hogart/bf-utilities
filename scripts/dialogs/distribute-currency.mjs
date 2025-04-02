@@ -1,12 +1,14 @@
 import { _actorReceivedCoinageString, divideCurencyWithExchange, divideCurrencyInWilderness } from '../lib/currency.mjs';
 import { notifyActorOwner } from '../lib/utils.mjs';
-import { getPath, registerPartial, render } from '../lib/tpl.mjs';
+import { getPath, render } from '../lib/tpl.mjs';
 import { getPcActors, getSelectedActors } from '../lib/actor.mjs';
 import { currencyList, upsertActorCoinage } from '../lib/actor-currency.mjs';
+import { CurrencyInputElement } from '../components/currency-input.mjs';
+import { ActorSelectorElement } from '../components/actor-selector.mjs';
 
 export async function distributeCurrency(actors = getPcActors(true)) {
-  await registerPartial('actor-checkbox');
-  await registerPartial('currency-input');
+  ActorSelectorElement.register();
+  CurrencyInputElement.register();
   loadTemplates([
     getPath('distribute-currency'),
   ]);
@@ -21,10 +23,10 @@ export async function distributeCurrency(actors = getPcActors(true)) {
           const $html = /** @type {JQuery} */ (html);
           const form = $html[0]; // de-jqueryify!
 
-          const pp = /** @type {HTMLInputElement} */ (form.querySelector('[name="platinum"]')).valueAsNumber;
-          const gp = /** @type {HTMLInputElement} */ (form.querySelector('[name="gold"]')).valueAsNumber;
-          const sp = /** @type {HTMLInputElement} */ (form.querySelector('[name="silver"]')).valueAsNumber;
-          const cp = /** @type {HTMLInputElement} */ (form.querySelector('[name="copper"]')).valueAsNumber;
+          const pp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="platinum"]')).valueAsNumber;
+          const gp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="gold"]')).valueAsNumber;
+          const sp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="silver"]')).valueAsNumber;
+          const cp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="copper"]')).valueAsNumber;
           const method = /** @type {HTMLInputElement} */ (form.querySelector('[name="method"]:checked')).value;
 
           assignCurrency(

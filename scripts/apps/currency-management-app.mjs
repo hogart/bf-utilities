@@ -1,7 +1,9 @@
+import { ActorSelectorElement } from '../components/actor-selector.mjs';
+import { CurrencyInputElement } from '../components/currency-input.mjs';
 import { currencyList, getActorCoinage, upsertActorCoinage } from '../lib/actor-currency.mjs';
 import { getPCActorsInSameFolder } from '../lib/actor.mjs';
 import { NotEnoughMoneyError, spendCoinage } from '../lib/currency.mjs';
-import { getPath, registerPartial } from '../lib/tpl.mjs';
+import { getPath } from '../lib/tpl.mjs';
 
 // @ts-expect-error wrong typings?
 export class CurrencyManagementApp extends Application {
@@ -128,8 +130,9 @@ export class CurrencyManagementApp extends Application {
    * @returns {Promise<CurrencyManagementApp>}
    */
   static async showApp({actor}) {
-    await registerPartial('currency-input');
-    await registerPartial('actor-checkbox');
+    CurrencyInputElement.register();
+    ActorSelectorElement.register();
+
     const app = new CurrencyManagementApp({actor});
     app.render(true);
 

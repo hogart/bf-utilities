@@ -1,3 +1,4 @@
+import { MODULE_ID } from './module-id.mjs';
 import { isPc } from './utils.mjs';
 
 /**
@@ -58,4 +59,32 @@ export function getPCActorsInSameFolder(actorOrId) {
   return /** @type BlackFlagActor[] */ (folder.contents).filter(
     folderActor => isPc(folderActor) && folderActor.id !== actor.id,
   );
+}
+
+/**
+ * Get or set a custom flag on an actor.
+ *
+ * If called with 2 arguments: returns the current flag value.
+ * If called with 3 arguments: sets the flag and returns the result.
+ *
+ * @param {BlackFlagActor | undefined} actor The actor to get/set the flag on.
+ * @param {string} key The key of the flag to access.
+ * @param {unknown} [value] Optional. If provided, the flag will be set to this value.
+ * @returns {Promise<unknown> | unknown | null} The flag value, or a promise if setting, or null if actor is missing.
+ */
+export function manageActorFlag(actor, key, value) {
+  if (!MODULE_ID) {
+    throw new Error('Cannot set flag');
+  }
+
+  if (!actor) {
+    return null;
+  }
+
+  if (arguments.length === 2) {
+    return actor.getFlag(MODULE_ID, key);
+  } else {
+    // @ts-expect-error incorrect typings
+    return actor.setFlag(MODULE_ID, key, value);
+  }
 }

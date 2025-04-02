@@ -11,9 +11,9 @@
 
     <div id="creature-section">
       {{#each battleFieldXp}}
-        {{> cr_entry xpTable=../xpTable creatureCr=this.cr creatureCount=this.count}}
+        <bfu-cr-entry cr="{{this.cr}}" quantity="{{this.count}}"></bfu-cr-entry>
       {{/each}}
-      {{> cr_entry xpTable=xpTable}}
+      <bfu-cr-entry cr="" quantity="0"></bfu-cr-entry>
     </div>
     <button type="button" class="add-creature-btn">
       <i class="fas fa-add"></i>
@@ -24,7 +24,7 @@
   <fieldset>
     <legend>To this characters:</legend>
     {{#each actors}}
-      {{> actor_checkbox actor=this}}
+      <bfu-actor-selector actor-id="{{this.id}}" name="{{this.name}}" img="{{this.img}}"></bfu-actor-selector>
     {{/each}}
   </fieldset>
   <fieldset>

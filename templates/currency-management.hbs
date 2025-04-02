@@ -3,7 +3,7 @@
     <legend>How much money?</legend>
 
     {{#each currencies}}
-      {{> currency_input currency=this}}
+      <bfu-currency-input amount="0" name="{{this.name}}" img="{{this.img}}" label="{{this.label}}"></bfu-currency-input>
     {{/each}}
   </fieldset>
 
@@ -32,7 +32,7 @@
     <legend>Transfer to:</legend>
 
     {{#each fellows}}
-      {{> actor_checkbox actor=this radio=true}}
+      <bfu-actor-selector actor-id="{{this.id}}" name="{{this.name}}" img="{{this.img}}"></bfu-actor-selector>
     {{/each}}
   </fieldset>
 

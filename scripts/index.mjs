@@ -110,9 +110,10 @@ function injectPartySheetButton(_app, $html) {
 
     button.on('click', (event) => {
       event.stopImmediatePropagation();
-      // @ts-expect-error wrong typings?
-      const actors = folder.contents.filter(isPc);
-      PartySheetApp.showApp({actors, folderId: folder._id});
+      const contents = /** @type BlackFlagActor[] */(folder.contents);
+      const actors = contents.filter(isPc);
+      const partyData = contents.find(a => a.name === '_partyData');
+      PartySheetApp.showApp({actors, folderId: folder._id, partyData});
     });
   });
 }

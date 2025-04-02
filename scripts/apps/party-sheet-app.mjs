@@ -7,17 +7,23 @@ import { firstToUpper } from '../lib/first-to-upper.mjs';
 import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
 import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
+import { DoomPointsElement } from '../components/doom-points.mjs';
+import { manageActorFlag } from '../lib/actor.mjs';
 
 // @ts-expect-error wrong typings?
 export class PartySheetApp extends Application {
   /**
-   * @param {{ actors: BlackFlagActor[]; folderId?: string; }} params
+   * @param {{ actors: BlackFlagActor[]; folderId?: string; partyData?: BlackFlagActor}} params
    */
   constructor(params, options = {}) {
     super(options);
     /** @type BlackFlagActor[] */
     this.actors = params.actors;
     this.folderId = params.folderId;
+    /** @type BlackFlagActor | undefined*/
+    this.partyData = params.partyData;
+
+    DoomPointsElement.register();
   }
 
   /**
@@ -155,11 +161,14 @@ export class PartySheetApp extends Application {
         });
     }
 
+    const doomPoints = manageActorFlag(this.partyData, 'doomPoints') || 0;
+
     return {
       isGM: !!game.user?.isGM,
       actors,
       enableGrantXp: getSetting(SHOW_GRANT_XP_BUTTON),
       enableDistributeCurrency: getSetting(SHOW_DISTRIBUTE_CURRENCY_BUTTON),
+      doomPoints,
     };
   }
 
@@ -226,6 +235,15 @@ export class PartySheetApp extends Application {
       CurrencyManagementApp.showApp({actor});
     });
 
+    html.on(
+      // @ts-expect-error jQuery doesn't really work with custom events
+      'doom',
+      'bfu-doom-points',
+      (/** @type {CustomEvent<{points: number}>} */event) => {
+        manageActorFlag(this.partyData, 'doomPoints', event.detail.points);
+      },
+    );
+
     this.#unsubscribers.push(
       moduleBus.listenSettingChange(SHOW_GRANT_XP_BUTTON, (newValue) => {
         html.toggleClass('enable-grant-xp', /** @type boolean */(newValue));
@@ -240,14 +258,14 @@ export class PartySheetApp extends Application {
   }
 
   /**
-   * @param {Application.CloseOptions} _options
+   * @param {Application.CloseOptions} options
    */
-  async close(_options) {
+  async close(options) {
     for (const unsubscribe of this.#unsubscribers) {
       unsubscribe();
     }
 
-    return super.close(_options);
+    return super.close(options);
   }
 
   registerHooks() {
@@ -269,7 +287,7 @@ export class PartySheetApp extends Application {
   }
 
   /**
-   * @param {{ actors: BlackFlagActor[]; folderId?: string; }} params
+   * @param {{ actors: BlackFlagActor[]; folderId?: string; partyData?: BlackFlagActor}} params
    * @returns {Promise<PartySheetApp>}
    */
   static async showApp(params) {

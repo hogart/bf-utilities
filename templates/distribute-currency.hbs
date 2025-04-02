@@ -2,13 +2,13 @@
   <fieldset>
     <legend>How much money?</legend>
     {{#each currencies}}
-      {{> currency_input currency=this}}
+      <bfu-currency-input amount="0" name="{{this.name}}" img="{{this.img}}" label="{{this.label}}"></bfu-currency-input>
     {{/each}}
   </fieldset>
   <fieldset>
     <legend>Distribute between:</legend>
     {{#each actors}}
-      {{> actor_checkbox actor=this}}
+      <bfu-actor-selector actor-id="{{this.id}}" name="{{this.name}}" img="{{this.img}}"></bfu-actor-selector>
     {{/each}}
   </fieldset>
   <fieldset>
