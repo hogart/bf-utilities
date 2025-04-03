@@ -6,6 +6,7 @@ import { isPc } from './lib/utils.mjs';
 import { PartySheetApp } from './apps/party-sheet-app.mjs';
 import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
 import { registerSettings, getSetting, SHOW_PARTY_SHEET_BUTTON, SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET, SHOW_XP_AFTER_BATTLE } from './lib/settings.mjs';
+import { registerHandlebarsHelpers } from './lib/tpl.mjs';
 
 function injectModuleApi() {
   if (!MODULE_ID) {
@@ -15,6 +16,8 @@ function injectModuleApi() {
   const module = game.modules?.get(MODULE_ID);
 
   if (module) {
+    registerHandlebarsHelpers();
+
     const api = {
       grantXp,
       distributeCurrency,

@@ -1,6 +1,20 @@
 import { toKebab } from '../lib/to-kebab.mjs';
 
 export class BaseElement extends HTMLElement {
+  constructor() {
+    super();
+
+    // Register nested elements if defined
+    const ctor = /** @type {typeof BaseElement} */ (this.constructor);
+    if (Array.isArray(ctor.elements)) {
+      for (const el of ctor.elements) {
+        if (typeof el.register === 'function') {
+          el.register();
+        }
+      }
+    }
+  }
+
   /**
    * @param {string} name
    * @param {unknown?} detail
@@ -185,21 +199,27 @@ export class BaseElement extends HTMLElement {
 
   /**
    * @param {string|null} value
-   * @param {Function} type
+   * @param {Boolean|Number|Array<unknown>|Object} type
    */
   #castAttribute(value, type) {
     if (type === Boolean) {
       return value != null;
     }
+
     if (type === Number) {
       return Number(value);
     }
+
+    if (type === Array || type === Object) {
+      return value ? JSON.parse(value) : value;
+    }
+
     return value;
   }
 
   /**
    * @param {unknown} value
-   * @param {Function} type
+   * @param {Boolean|Number|Array<unknown>|Object} type
    */
   #stringifyAttribute(value, type) {
     if (type === Boolean) {
@@ -210,6 +230,10 @@ export class BaseElement extends HTMLElement {
       return String(value);
     }
 
+    if (type === Array || type === Object) {
+      return JSON.stringify(value);
+    }
+
     return value;
   }
 
@@ -218,7 +242,13 @@ export class BaseElement extends HTMLElement {
    * @example /** \@type {number} *\/ points;
    * This allows TypeScript to recognize them during development.
    *
-   * @type {Record<string, { type: Function, reflect: boolean }>}
+   * @type {Record<string, { type: Boolean|Number|Array<unknown>|Object, reflect: boolean }>}
    */
   static properties = {};
+
+  /**
+   * Optional static property listing nested elements to auto-register.
+   * @type {Array<typeof BaseElement>}
+   */
+  static elements;
 }

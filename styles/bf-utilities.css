@@ -12,8 +12,6 @@
     width: 100%;
   }
 
-
-
   .distribute-methods {
     flex-direction: column;
     align-items: start;
@@ -110,39 +108,6 @@
       margin-top: -1ch;
       justify-content: space-between;
     }
-
-    .portrait-wrapper {
-      position: relative;
-
-      .marker {
-        position: absolute;
-
-        > i {
-          text-shadow: 0 0 1px gray;
-        }
-      }
-
-      .senses {
-        left: 0;
-        top: 0;
-      }
-
-      .movement {
-        right: 0;
-        top: 0;
-      }
-
-      .size {
-        left: 0;
-        bottom: 0;
-      }
-
-      .type {
-        right: 0;
-        bottom: 0;
-      }
-    }
-
   }
 
   .pc-info {
@@ -166,21 +131,6 @@
     p {
       margin-top: 0;
       margin-bottom: 0;
-    }
-  }
-
-  .character-skills {
-    list-style: none;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    font-size: 10px;
-    padding-left: 0;
-    border-top: 1px solid var(--bf-color-border-blue);
-    border-bottom: 1px solid var(--bf-color-border-blue);
-
-    li:has(+ li) {
-      margin-right: 1ch;
     }
   }
 
@@ -210,20 +160,7 @@
     }
   }
 
-  .origin {
-    font-size: 85%;
-    opacity: 0.75;
-  }
 
-  a.compendium {
-    display: inline-flex;
-    align-items: center;
-
-    img {
-      height: 1.2rem;
-      margin-right: 1ch;
-    }
-  }
 
   .owner-only,
   .gm-only {

@@ -18,33 +18,16 @@
     {{#each actors}}
       <li class="pc-item {{#if isOwner}}isOwner{{/if}}">
         <div class="pc-portrait">
-          <div class="portrait-wrapper">
-            <img src="{{img}}" alt="{{name}}" data-open-sheet="{{@index}}"/>
-
-            {{#if senses}}
-              <div class="marker senses" title="{{senses}}">
-                <i class="fa-solid fa-eye"></i>
-              </div>
-            {{/if}}
-
-            {{#if type}}
-              <span class="marker type" title="{{type}}">
-                <i class="fa-solid fa-person"></i>
-              </span>
-            {{/if}}
-
-            {{#if size}}
-              <span class="marker size" title="{{size}}">
-                <i class="fa-solid fa-ruler"></i>
-              </span>
-            {{/if}}
-
-            {{#if movement}}
-              <span class="marker movement" title="{{movement}}">
-                <i class="fa-solid fa-feather"></i>
-              </span>
-            {{/if}}
-          </div>
+          <bfu-pc-portrait
+            name="{{name}}"
+            img="{{img}}"
+            actor-id="{{_id}}"
+            senses="{{senses}}"
+            type="{{type}}"
+            size="{{size}}"
+            movement="{{movement}}"
+            data-open-sheet
+          ></bfu-pc-portrait>
 
           <meter
             max="{{hp.max}}"
@@ -65,39 +48,28 @@
         </div>
         <div class="pc-info">
           <div class="pc-header">
-            <a class="name" data-open-sheet="{{@index}}">{{name}}</c>
+            <a class="name" data-open-sheet="{{@index}}">{{name}}</a>
 
             <p class="character-classes">
               {{#each classes}}
-                <a data-open-item="{{_id}}" data-actor-index="{{@index}}" class="compendium">
-                  <img src="{{img}}" alt="{{name}}"/>
-                  {{name}}
-                  {{levels}}
-                </a>
+                <bfu-feature-link
+                  img="{{img}}"
+                  alt="{{name}}"
+                  item-id="{{_id}}"
+                  label="{{name}} {{levels}}"
+                ></bfu-feature-link>
               {{/each}}
             </p>
           </div>
 
-          <div class="origin">
-            <a data-open-item="{{heritage._id}}" data-actor-index="{{@index}}" class="compendium">
-              {{heritage.name}}
-            </a>
-            <a data-open-item="{{lineage._id}}" data-actor-index="{{@index}}" class="compendium">
-              {{lineage.name}}
-            </a>,
-            <a data-open-item="{{background._id}}" data-actor-index="{{@index}}" class="compendium">
-              {{background.name}}
-            </a>
-          </div>
+          <bfu-pc-origin
+            heritage="{{jsonattr heritage}}"
+            lineage="{{jsonattr lineage}}"
+            background="{{jsonattr background}}"
+            data-open-feature
+          ></bfu-pc-origin>
 
-          <ul class="character-skills">
-            {{#each highestSkills}}
-              <li>
-                {{localize label}}
-                {{mod}}
-              </li>
-            {{/each}}
-          </ul>
+          <bfu-pc-skills skills="{{jsonattr highestSkills}}"></bfu-pc-skills>
 
           <div class="misc">
             <span title="Luck" class="luck">

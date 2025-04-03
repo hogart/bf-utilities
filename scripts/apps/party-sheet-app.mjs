@@ -7,8 +7,12 @@ import { firstToUpper } from '../lib/first-to-upper.mjs';
 import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
 import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
-import { DoomPointsElement } from '../components/doom-points.mjs';
 import { manageActorFlag } from '../lib/actor.mjs';
+import { DoomPointsElement } from '../components/doom-points.mjs';
+import { PcPortraitElement } from '../components/pc-portrait.mjs';
+import { PcSkillsElement } from '../components/pc-skills.mjs';
+import { PcOriginElement } from '../components/pc-origin.mjs';
+import { FeatureLinkElement } from '../components/feature-link.mjs';
 
 // @ts-expect-error wrong typings?
 export class PartySheetApp extends Application {
@@ -24,6 +28,11 @@ export class PartySheetApp extends Application {
     this.partyData = params.partyData;
 
     DoomPointsElement.register();
+    PcPortraitElement.register();
+    PcSkillsElement.register();
+    PcOriginElement.register();
+    FeatureLinkElement.register();
+    PcOriginElement.register();
   }
 
   /**
@@ -68,6 +77,7 @@ export class PartySheetApp extends Application {
         name,
         label: skill.labels.name,
         mod: skill.mod,
+        proficiencyLevel: skill.proficiency.multiplier,
       };
     });
 
@@ -157,6 +167,7 @@ export class PartySheetApp extends Application {
           return {
             label: s.label,
             mod: `${s.mod > 0 ? '+' : '-'}${Math.abs(s.mod)}`,
+            proficiencyLevel: s.proficiencyLevel,
           };
         });
     }
@@ -241,6 +252,18 @@ export class PartySheetApp extends Application {
       'bfu-doom-points',
       (/** @type {CustomEvent<{points: number}>} */event) => {
         manageActorFlag(this.partyData, 'doomPoints', event.detail.points);
+      },
+    );
+
+    html.on(
+      // @ts-expect-error jQuery doesn't really work with custom events
+      'opensheet',
+      '[data-open-sheet]',
+      (/** @type {CustomEvent<BlackFlagActor['_id']>} */event) => {
+        const actor = this.actors.find(a => a._id === event.detail);
+        if (actor) {
+          actor.sheet?.render(true);
+        }
       },
     );
 

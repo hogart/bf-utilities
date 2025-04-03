@@ -77,6 +77,9 @@ declare global {
             name: string,
           },
           mod: number,
+          proficiency: {
+            multiplier: ProficiencyLevel,
+          }
         }>,
       },
 
@@ -91,16 +94,20 @@ declare global {
     img: BlackFlagItem['img'],
   }
 
+  type ProficiencyLevel = 0 | 0.5 | 1 | 2;
+
   interface ActorTplSkill {
     name: string,
     mod: number,
     label: string,
-    isHighest?: boolean;
+    proficiencyLevel: ProficiencyLevel,
+    isHighest?: boolean,
   }
 
   interface ActorTplHighSkill {
     label: string,
     mod: string,
+    proficiencyLevel: ProficiencyLevel,
   }
 
   interface ActorTplData {

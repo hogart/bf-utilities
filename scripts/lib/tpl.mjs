@@ -10,21 +10,46 @@ export function getPath(template) {
 }
 
 /**
+ * Escape quotes and special HTML chars
+ * @param {string} str
+ * @returns {string}
+ */
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/**
  * @param {string} template
  * @param {Record<string, unknown>} ctx
  * @returns {Promise<string>}
  */
 export async function render(template, ctx) {
+  registerHandlebarsHelpers();
+  return await renderTemplate(getPath(template), {MODULE_ID, ...ctx});
+}
+
+export function registerHandlebarsHelpers() {
   Handlebars.registerHelper('eqeqeq', function(a, b) {
     return a === b;
   });
+
   Handlebars.registerHelper('eq', function(a, b) {
     return a == b;
   });
+
   Handlebars.registerHelper('neq', function(a, b) {
     return a != b;
   });
-  return await renderTemplate(getPath(template), {MODULE_ID, ...ctx});
+
+  Handlebars.registerHelper('jsonattr', function (value) {
+    const json = JSON.stringify(value);
+    return new Handlebars.SafeString(escapeHtml(json));
+  });
 }
 
 
