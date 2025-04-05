@@ -14,6 +14,8 @@ Copy and paste this url into the *Manifest URL* input in *Install Module* window
 * XP management: award experience points based on defeated creatures, or just any amount.
 * Party sheet: a wealth of information at a glance.
 * Show the XP dialog when the battle ends.
+* Doom points
+* [Drag Ruler](https://foundryvtt.com/packages/drag-ruler) integration (use [Valerionn's fork](https://github.com/Valerionn/foundryvtt-drag-ruler))
 * API: all features are accessible to other scripts and macros at `game.modules?.get('bf-utilities')?.api`.
 * Settings: all features can be turned on/off.
 
