@@ -4,7 +4,7 @@ import { getActorCoinage } from '../lib/actor-currency.mjs';
 import { moduleBus } from '../lib/module-bus.mjs';
 import { coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
 import { firstToUpper } from '../lib/first-to-upper.mjs';
-import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
+import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_DOOM_POINTS, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
 import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
 import { manageActorFlag } from '../lib/actor.mjs';
@@ -172,13 +172,21 @@ export class PartySheetApp extends Application {
         });
     }
 
-    const doomPoints = manageActorFlag(this.partyData, 'doomPoints') || 0;
+    const enableDoomPoints = getSetting(SHOW_DOOM_POINTS);
+    const doomPoints = enableDoomPoints
+      ? (
+        this.partyData
+          ? manageActorFlag(this.partyData, 'doomPoints') ?? 0
+          : NaN
+      )
+      : 0;
 
     return {
       isGM: !!game.user?.isGM,
       actors,
       enableGrantXp: getSetting(SHOW_GRANT_XP_BUTTON),
       enableDistributeCurrency: getSetting(SHOW_DISTRIBUTE_CURRENCY_BUTTON),
+      enableDoomPoints,
       doomPoints,
     };
   }
@@ -276,6 +284,12 @@ export class PartySheetApp extends Application {
     this.#unsubscribers.push(
       moduleBus.listenSettingChange(SHOW_DISTRIBUTE_CURRENCY_BUTTON, (newValue) => {
         html.toggleClass('enable-distribute-currency', /** @type boolean */(newValue));
+      }),
+    );
+
+    this.#unsubscribers.push(
+      moduleBus.listenSettingChange(SHOW_DOOM_POINTS, (newValue) => {
+        html.toggleClass('enable-doom-points', /** @type boolean */(newValue));
       }),
     );
   }

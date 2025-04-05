@@ -21,16 +21,26 @@ export class DoomPointsElement extends BaseElement {
   `;
 
   render() {
+    if (isNaN(this.points)) {
+      return /* html */`
+        <div class="doom-points">
+          <span data-tooltip="Create an NPC called _partyData to use Doom points">
+            <i class="fas fa-circle-exclamation"></i>
+          </span>
+        </div>
+      `;
+    }
+
     return /* html */`
       <div class="doom-points">
-        <a title="Spend Doom" data-spend ${this.points ? '' : 'disabled'}>
+        <a data-tooltip="Spend Doom" data-spend ${this.points ? '' : 'disabled'}>
           <i class="fas fa-minus"></i>
         </a>
-        <span title="Current Doom points">
+        <span data-tooltip="Current Doom points">
           <i class="fas fa-skull"></i>
           ${this.points}
         </span>
-        <a title="Gain Doom" data-gain>
+        <a data-tooltip="Gain Doom" data-gain>
           <i class="fas fa-plus"></i>
         </a>
       </div>

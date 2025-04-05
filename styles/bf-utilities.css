@@ -27,13 +27,14 @@
   .actions {
     display: none;
     flex-direction: row;
+    align-items: center;
     gap: 1rem;
 
     border-bottom: 1px solid var(--bf-color-border-blue);
     padding-bottom: 1ch;
     margin-bottom: 1rem;
 
-    button {
+    .action {
       width: auto;
       display: none;
     }
@@ -42,16 +43,23 @@
   &.enable-grant-xp .actions {
     display: flex;
 
-    button[data-action="grant-xp"] {
+    .action[data-action="grant-xp"] {
       display: block;
     }
   }
 
   &.enable-distribute-currency .actions {
     display: flex;
-    align-items: center;
 
-    button[data-action="distribute-currency"] {
+    .action[data-action="distribute-currency"] {
+      display: block;
+    }
+  }
+
+  &.enable-doom-points .actions {
+    display: flex;
+
+    bfu-doom-points.action {
       display: block;
     }
   }

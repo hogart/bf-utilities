@@ -1,17 +1,17 @@
-<div class="party-sheet {{#if isGM}}isGM{{/if}} {{#if enableDistributeCurrency}}enable-distribute-currency{{/if}} {{#if enableGrantXp}}enable-grant-xp{{/if}} ">
+<div class="party-sheet {{#if isGM}}isGM{{/if}} {{#if enableDistributeCurrency}}enable-distribute-currency{{/if}} {{#if enableGrantXp}}enable-grant-xp{{/if}} {{#if enableDoomPoints}}enable-doom-points{{/if}} ">
   {{#if isGM}}
     <div class="actions">
-      <button data-action="distribute-currency">
+      <button class="action" data-action="distribute-currency">
         <i class="fas fa-coins"></i>
         Distribute currency
       </button>
 
-      <button data-action="grant-xp">
+      <button class="action" data-action="grant-xp">
         <i class="fa-solid fa-arrow-down-up-across-line"></i>
         Grant XP
       </button>
 
-      <bfu-doom-points points="{{doomPoints}}"></bfu-doom-points>
+      <bfu-doom-points class="action" points="{{doomPoints}}"></bfu-doom-points>
     </div>
   {{/if}}
   <ul class="pc-items">

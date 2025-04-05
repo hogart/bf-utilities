@@ -6,6 +6,7 @@ export const SHOW_PARTY_SHEET_BUTTON = 'show-party-sheet-button';
 export const SHOW_GRANT_XP_BUTTON = 'show-grant-xp-button';
 export const SHOW_DISTRIBUTE_CURRENCY_BUTTON = 'show-distribute-currency-button';
 export const SHOW_XP_AFTER_BATTLE = 'show-xp-after-battle';
+export const SHOW_DOOM_POINTS = 'show-xp-after-battle';
 
 /**
  * @param {string} settingName
@@ -107,6 +108,17 @@ export function registerSettings() {
     SHOW_XP_AFTER_BATTLE,
     {
       name: 'Show "Grant XP" button after a battle',
+      ...checkboxBasedSetting,
+      requiresReload: false,
+    },
+  );
+
+  registerSetting(
+    SHOW_DOOM_POINTS,
+    {
+      name: 'Show Doom points in the party sheet',
+      hint: 'Create an NPC called _partyData. It will be used as a storage for the Doom points.',
+
       ...checkboxBasedSetting,
       requiresReload: false,
     },
