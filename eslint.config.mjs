@@ -37,6 +37,7 @@ export default [
           Application: 'readonly',
           FormApplication: 'readonly',
           CONFIG: 'readonly',
+          dragRuler: 'readonly',
         },
         $: 'readonly',
       },

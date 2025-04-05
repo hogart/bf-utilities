@@ -127,6 +127,11 @@ function onDeleteCombat() {
   }
 }
 
+Hooks.once('dragRuler.ready', async (/** @type {Constructor} */ SpeedProvider) => {
+  const integrate = await import('./integrations/drag-ruler.mjs');
+  integrate.default(SpeedProvider);
+});
+
 Hooks.on('init', injectModuleApi);
 Hooks.once('init', registerSettings);
 Hooks.on('renderPCSheet', injectCurrencyButton);

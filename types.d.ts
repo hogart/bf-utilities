@@ -33,6 +33,11 @@ declare global {
         luck: {
           value: number,
         },
+        exhaustion: 0 | 1 | 3 | 4 | 5,
+        death: {
+          failure: 0 | 1 | 2 | 3,
+          success: 0 | 1 | 2 | 3,
+        }
       },
       progression: {
         classes: Record<string, {
@@ -85,6 +90,10 @@ declare global {
 
       addLuck: () => Promise<void>,
     },
+  }
+
+  interface BlackFlagTokenDocument extends TokenDocument {
+    actor: BlackFlagActor;
   }
 
   interface ActorTplClass {
@@ -172,6 +181,13 @@ declare global {
       luck: {
         max: number;
       };
+    };
+  }
+
+  interface Window {
+    dragRuler?: {
+      registerModule: (moduleId: string, api: Constructor) => void;
+      [key: string]: unknown;
     };
   }
 }
