@@ -54,6 +54,26 @@ export class PartySheetApp extends Application {
 
   /**
    * @param {BlackFlagActor} actor
+   * @returns {string | null}
+   */
+  #actorMovement(actor) {
+    const movement = actor.system.traits.movement;
+    if (
+      movement.base !== 30 ||
+      movement.custom.length ||
+      movement.multiplier !== '1' ||
+      movement.tags.size ||
+      movement.types.walk !== 30 ||
+      Object.values(movement.types).filter(s => s !== 0).length > 1
+    ) {
+      return movement.labels.join(', ');
+    }
+
+    return null;
+  }
+
+  /**
+   * @param {BlackFlagActor} actor
    * @returns {Promise<ActorTplData>}
    */
   async #actorViewModel(actor) {
@@ -113,7 +133,8 @@ export class PartySheetApp extends Application {
       senses: actor.system.traits.senses.label ? actor.system.traits.senses.label : null,
       type: actor.system.traits.type.label !== 'Humanoid' ? actor.system.traits.type.label : null,
       size: actor.system.traits.size !== 'medium' ? firstToUpper(actor.system.traits.size) : null,
-      movement: actor.system.traits.movement.labels,
+      movement: this.#actorMovement(actor),
+      talents: actor.items.filter(i => i.type === 'talent'),
 
       isOwner: actor.id === game.user?.character?.id,
     };
@@ -271,6 +292,25 @@ export class PartySheetApp extends Application {
         const actor = this.actors.find(a => a._id === event.detail);
         if (actor) {
           actor.sheet?.render(true);
+        }
+      },
+    );
+
+    html.on(
+      // @ts-expect-error jQuery doesn't really work with custom events
+      'openfeature',
+      'bfu-feature-link',
+      (/** @type {CustomEvent<BlackFlagActor['_id']>} */event) => {
+        const targetEl = /** @type {HTMLElement} */(event.target);
+        const itemId = /** @type {string} */(event.detail);
+        const actorIdEl = /** @type {HTMLElement} */(targetEl?.closest('[data-actor-id]'));
+        const actorId = actorIdEl?.dataset.actorId;
+        const actor = this.actors.find(a => a._id === actorId);
+        const item = actor?.items.get(itemId);
+        if (item) {
+          item.sheet?.render(true); // Open the item's sheet
+        } else {
+          console.warn('Item not found for ID:', itemId);
         }
       },
     );

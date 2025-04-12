@@ -16,7 +16,7 @@
   {{/if}}
   <ul class="pc-items">
     {{#each actors}}
-      <li class="pc-item {{#if isOwner}}isOwner{{/if}}">
+      <li class="pc-item {{#if isOwner}}isOwner{{/if}}" data-actor-id="{{_id}}">
         <div class="pc-portrait">
           <bfu-pc-portrait
             name="{{name}}"
@@ -66,6 +66,7 @@
             heritage="{{jsonattr heritage}}"
             lineage="{{jsonattr lineage}}"
             background="{{jsonattr background}}"
+            talents="{{jsonattr talents}}"
             data-open-feature
           ></bfu-pc-origin>
 

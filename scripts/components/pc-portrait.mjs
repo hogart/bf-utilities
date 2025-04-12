@@ -7,7 +7,7 @@ export class PcPortraitElement extends BaseElement {
   /** @type {string} */ senses = '';
   /** @type {string} */ type = '';
   /** @type {string} */ size = '';
-  /** @type {string} */ movement = '';
+  /** @type {string | null} */ movement = null;
 
   static properties = {
     actorId: { type: String, reflect: true },

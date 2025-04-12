@@ -35,10 +35,7 @@ export class FeatureLinkElement extends BaseElement {
   render() {
     const img = this.img ? `<img src="${this.img}" alt="${this.alt}"/>` : '';
     return /* html */`
-      <a data-feature="${this.itemId}">
-        ${img}
-        ${this.label}
-      </a>
-    `;
+      <a data-feature="${this.itemId}">${img}${this.label}</a>
+    `.trim();
   }
 }

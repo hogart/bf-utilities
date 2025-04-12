@@ -5,11 +5,13 @@ export class PcOriginElement extends BaseElement {
   /** @type {BlackFlagItem | null} */ heritage = null;
   /** @type {BlackFlagItem | null} */ lineage = null;
   /** @type {BlackFlagItem | null} */ background = null;
+  /** @type {BlackFlagItem[] | null} */ talents = null;
 
   static properties = {
     heritage: { type: Object, reflect: true },
     lineage: { type: Object, reflect: true },
     background: { type: Object, reflect: true },
+    talents: { type: Array, reflect: true },
   };
 
   static elements = [
@@ -42,11 +44,16 @@ export class PcOriginElement extends BaseElement {
   }
 
   render() {
+    const talents = this.talents?.length
+      ? `(${this.talents.map(this.renderOrigin).join(', ')})`
+      : '';
+
     return /* html */`
       <div class="origin">
         ${this.renderOrigin(this.heritage)}
         ${this.renderOrigin(this.lineage)},
         ${this.renderOrigin(this.background)}
+        ${talents}
       </div>
     `;
   }

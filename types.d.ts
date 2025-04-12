@@ -63,8 +63,11 @@ declare global {
           label: string,
         },
         movement: {
+          base: number,
+          custom: unknown[],
+          multiplier: string,
           label: string,
-          labels: string,
+          labels: string[],
           tags: Set<string>,
           types: {
             walk: number,
@@ -150,7 +153,8 @@ declare global {
     senses: BlackFlagActor['system']['progression']['traits']['senses']['label'] | null,
     type: BlackFlagActor['system']['progression']['traits']['type']['label'] | null,
     size: BlackFlagActor['system']['progression']['traits']['size'] | null,
-    movement: BlackFlagActor['system']['progression']['traits']['movement']['labels'],
+    movement: string | null,
+    talents: BlackFlagItem[],
 
     isOwner: boolean,
   }
