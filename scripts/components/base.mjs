@@ -127,6 +127,17 @@ export class BaseElement extends HTMLElement {
 
     this.#tryRender();
     this.activateListeners();
+
+    // Apply host attributes if defined
+    if (this.host && typeof this.host === 'object') {
+      for (const [attr, value] of Object.entries(this.host)) {
+        if (value === false || value == null) {
+          this.removeAttribute(attr);
+        } else {
+          this.setAttribute(attr, value === true ? '' : String(value));
+        }
+      }
+    }
   }
 
   #tryRender() {
@@ -188,11 +199,15 @@ export class BaseElement extends HTMLElement {
    * @param {string} css
    */
   static injectStyles(css) {
+    const kebab = toKebab(this.name.replace(/Element$/, ''));
+    const scoped = `bfu-${kebab} {
+${css}
+}`;
     const styleId = `bfu-style-${this.name.replace(/Element$/, '')}`;
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
-      style.textContent = css;
+      style.textContent = scoped;
       document.head.appendChild(style);
     }
   }
@@ -236,6 +251,12 @@ export class BaseElement extends HTMLElement {
 
     return value;
   }
+
+  /**
+   * Optional property with attributes to apply to the host element after rendering.
+   * @type {Record<string, string | number | boolean | null | undefined> | null}
+   */
+  host = null;
 
   /**
    * Subclasses must also declare their reactive props explicitly with JSDoc:
