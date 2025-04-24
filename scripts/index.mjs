@@ -2,7 +2,7 @@ import { grantXp, grantXpAfterBattle } from './dialogs/grant-xp.mjs';
 import { distributeCurrency } from './dialogs/distribute-currency.mjs';
 import { MODULE_ID } from './lib/module-id.mjs';
 import { getPcActors } from './lib/actor.mjs';
-import { isPc } from './lib/utils.mjs';
+import { getFolderActors, isPc } from './lib/utils.mjs';
 import { PartySheetApp } from './apps/party-sheet-app.mjs';
 import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
 import { registerSettings, getSetting, SHOW_PARTY_SHEET_BUTTON, SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET, SHOW_XP_AFTER_BATTLE } from './lib/settings.mjs';
@@ -21,8 +21,15 @@ function injectModuleApi() {
     const api = {
       grantXp,
       distributeCurrency,
-      async showPartySheet(actors = getPcActors(true)) {
-        return PartySheetApp.showApp({actors});
+      async showPartySheet(actors = getPcActors(true), folderId = '', partyData = undefined) {
+        return PartySheetApp.showApp({actors, folderId, partyData});
+      },
+      /**
+       * @param {string} folderId
+       */
+      async showPartySheetForFolder(folderId) {
+        const {actors, partyData} = getFolderActors(folderId);
+        return PartySheetApp.showApp({actors, folderId, partyData});
       },
       async showCurrencyManagement(actor = game.user?.character) {
         if (actor) {
@@ -113,9 +120,7 @@ function injectPartySheetButton(_app, $html) {
 
     button.on('click', (event) => {
       event.stopImmediatePropagation();
-      const contents = /** @type BlackFlagActor[] */(folder.contents);
-      const actors = contents.filter(isPc);
-      const partyData = contents.find(a => a.name === '_partyData');
+      const {actors, partyData} = getFolderActors(folder);
       PartySheetApp.showApp({actors, folderId: folder._id, partyData});
     });
   });

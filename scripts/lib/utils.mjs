@@ -28,3 +28,26 @@ export function notifyActorOwner(actor, message) {
 export function isPc(actor) {
   return actor.type === 'pc';
 }
+
+/**
+ * @param {string | Folder} folderOrID
+ */
+export function getFolderActors(folderOrID) {
+  const folder = typeof folderOrID === 'string' ? game.folders?.get(folderOrID) : folderOrID;
+
+  if (!folder) {
+    return {
+      actors: [],
+      partyData: undefined,
+    };
+  }
+
+  const contents = /** @type BlackFlagActor[] */(folder.contents);
+  const actors = contents.filter(isPc);
+  const partyData = contents.find(a => a.name === '_partyData');
+
+  return {
+    actors,
+    partyData,
+  };
+}
