@@ -29,11 +29,13 @@
             data-open-sheet
           ></bfu-pc-portrait>
 
-          <meter
+          <bfu-hp-meter
             max="{{hp.max}}"
-            value="{{hp.value}}"
-            data-display="{{hp.value}}{{#if hp.thp}}+{{hp.thp}}{{/if}}/{{hp.max}}"
-          ></meter>
+            current="{{hp.value}}"
+            thp="{{hp.thp}}"
+            {{#if ../isGM}}is-gm{{/if}}
+            {{#if isOwner}}is-owner{{/if}}
+          ></bfu-hp-meter>
 
           <div class="protection">
             <span title="AC: {{ac.label}}">

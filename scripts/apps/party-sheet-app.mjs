@@ -13,6 +13,7 @@ import { PcPortraitElement } from '../components/pc-portrait.mjs';
 import { PcSkillsElement } from '../components/pc-skills.mjs';
 import { PcOriginElement } from '../components/pc-origin.mjs';
 import { FeatureLinkElement } from '../components/feature-link.mjs';
+import { HpMeterElement } from '../components/hp-meter.mjs';
 
 // @ts-expect-error wrong typings?
 export class PartySheetApp extends Application {
@@ -33,6 +34,7 @@ export class PartySheetApp extends Application {
     PcOriginElement.register();
     FeatureLinkElement.register();
     PcOriginElement.register();
+    HpMeterElement.register();
   }
 
   /**
