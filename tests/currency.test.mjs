@@ -9,6 +9,8 @@ import {
   _actorReceivedCoinageString,
   spendCoinage,
   NotEnoughMoneyError,
+  coinageToWealth,
+  coinageToGold,
 } from '../scripts/lib/currency.mjs';
 
 test('_totalInCopper', (t) => {
@@ -211,5 +213,31 @@ test('spendCoinage', (t) => {
     ),
     {instanceOf: NotEnoughMoneyError},
     'does not throw an error when actor tries to spend too much money',
+  );
+});
+
+test('wealth', (t) => {
+  t.is(
+    coinageToWealth({pp: 1, gp: 0, sp: 0, cp: 0}),
+    '1.00 pp',
+    'incorrectly converts to wealth in the pp',
+  );
+
+  t.is(
+    coinageToWealth({pp: 0, gp: 2, sp: 0, cp: 0}),
+    '2.00 gp',
+    'incorrectly converts to wealth in the gp',
+  );
+
+  t.is(
+    coinageToWealth({pp: 0, gp: 0, sp: 3, cp: 20}),
+    '5.00 sp',
+    'incorrectly converts to wealth in the sp',
+  );
+
+  t.is(
+    coinageToGold({pp: 0, gp: 0, sp: 0, cp: 1234}),
+    '12.34 gp',
+    'incorrectly converts to gold',
   );
 });

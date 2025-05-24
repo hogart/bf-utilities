@@ -135,7 +135,7 @@ export function coinageToStrings(coinage) {
 
 /**
  * @param {Coinage} coinage
- * @returns {string}
+ * @returns {string} Human-friendly Wealth in the highest denomination
  */
 export function coinageToWealth(coinage) {
   const total = _totalInCopper(coinage.pp, coinage.gp, coinage.sp, coinage.cp);
@@ -149,6 +149,16 @@ export function coinageToWealth(coinage) {
   } else {
     return total + ' cp';
   }
+}
+
+/**
+ * @param {Coinage} coinage
+ * @returns {string} Human-friendly Wealth in gold pieces
+ */
+export function coinageToGold(coinage) {
+  const total = _totalInCopper(coinage.pp, coinage.gp, coinage.sp, coinage.cp);
+
+  return (total / 100).toFixed(2) + ' gp';
 }
 
 /**

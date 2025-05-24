@@ -7,6 +7,7 @@ export const SHOW_GRANT_XP_BUTTON = 'show-grant-xp-button';
 export const SHOW_DISTRIBUTE_CURRENCY_BUTTON = 'show-distribute-currency-button';
 export const SHOW_XP_AFTER_BATTLE = 'show-xp-after-battle';
 export const SHOW_DOOM_POINTS = 'show-xp-after-battle';
+export const USE_GP_WEALTH = 'use-gp-wealth';
 
 /**
  * @param {string} settingName
@@ -121,6 +122,16 @@ export function registerSettings() {
 
       ...checkboxBasedSetting,
       requiresReload: false,
+    },
+  );
+
+  registerSetting(
+    USE_GP_WEALTH,
+    {
+      name: 'Use GP wealth instead of the highest denomination',
+      hint: 'If enabled, the wealth will be displayed in GP instead of highest possible denomination.',
+
+      ...checkboxBasedSetting,
     },
   );
 

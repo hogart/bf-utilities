@@ -2,9 +2,9 @@ import { distributeCurrency } from '../dialogs/distribute-currency.mjs';
 import { grantXp } from '../dialogs/grant-xp.mjs';
 import { getActorCoinage } from '../lib/actor-currency.mjs';
 import { moduleBus } from '../lib/module-bus.mjs';
-import { coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
+import { coinageToGold, coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
 import { firstToUpper } from '../lib/first-to-upper.mjs';
-import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_DOOM_POINTS, SHOW_GRANT_XP_BUTTON } from '../lib/settings.mjs';
+import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_DOOM_POINTS, SHOW_GRANT_XP_BUTTON, USE_GP_WEALTH } from '../lib/settings.mjs';
 import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
 import { manageActorFlag } from '../lib/actor.mjs';
@@ -149,10 +149,11 @@ export class PartySheetApp extends Application {
   async #actorCoinageAndWealth(actor) {
     const coinage = await getActorCoinage(actor);
     const chunks = coinageToStrings(coinage);
+    const wealth = getSetting(USE_GP_WEALTH) ? coinageToGold(coinage) : coinageToWealth(coinage);
 
     return {
       coinage: chunks.join(', '),
-      wealth: coinageToWealth(coinage),
+      wealth,
     };
   }
 
