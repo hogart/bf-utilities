@@ -43,7 +43,6 @@ export class HpMeterElement extends BaseElement {
   `;
 
   renderNumbers() {
-    console.log(this.isGm, this.isOwner);
     if (this.isGm || this.isOwner) {
       return /* html */`<div class="number">
         ${this.current}${this.thp ? `+${this.thp}` : ''}/${this.max}
