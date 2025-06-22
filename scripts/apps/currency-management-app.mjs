@@ -3,6 +3,8 @@ import { CurrencyInputElement } from '../components/currency-input.mjs';
 import { currencyList, getActorCoinage, upsertActorCoinage } from '../lib/actor-currency.mjs';
 import { getPCActorsInSameFolder } from '../lib/actor.mjs';
 import { NotEnoughMoneyError, spendCoinage } from '../lib/currency.mjs';
+import { getActiveGMs } from '../lib/get-active-gms.mjs';
+import { MODULE_ID } from '../lib/module-id.mjs';
 import { getPath } from '../lib/tpl.mjs';
 
 // @ts-expect-error wrong typings?
@@ -98,6 +100,14 @@ export class CurrencyManagementApp extends Application {
       ui.notifications?.error(`Invalid actor id: ${target}`);
     }
 
+    const activeGmId = getActiveGMs()[0].id;
+
+    game.socket?.emit(`module.${MODULE_ID}`, {
+      type: 'transfer-currency',
+      payload: {},
+      recipients: [activeGmId],
+    });
+
     const actorCoinage = await getActorCoinage(this.actor);
 
     try {
@@ -114,6 +124,7 @@ export class CurrencyManagementApp extends Application {
     return {
       actor: this.actor,
       currencies: currencyList,
+      hasGM: !!game.user?.isGM || getActiveGMs().length > 0,
       fellows: getPCActorsInSameFolder(this.actor).map((actor) => {
         return {
           id: actor.id,
@@ -137,5 +148,18 @@ export class CurrencyManagementApp extends Application {
     app.render(true);
 
     return app;
+  }
+
+  /**
+   * @param {string} actorId
+   */
+  static async showAppForActorId(actorId) {
+    const actor = game.actors?.get(actorId);
+    if (!actor) {
+      ui.notifications?.error(`No actor with id ${actorId} found`);
+      return;
+    }
+
+    return CurrencyManagementApp.showApp({actor: /** @type BlackFlagActor */(actor)});
   }
 }

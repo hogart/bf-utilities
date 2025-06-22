@@ -10,22 +10,15 @@
   <fieldset>
     <legend>Transaction type</legend>
 
-    <label>
-      <input name="transaction" type="radio" value="receive" checked/>
-      Receive
-    </label>
-
-    <label>
-      <input name="transaction" type="radio" value="spend"/>
-      Spend
-    </label>
-
-    {{#if isGM}}
-    <label>
-      <input name="transaction" type="radio" value="transfer"/>
-      Transfer
-    </label>
-    {{/if}}
+    <div class="form-group">
+      <select name="transaction">
+        <option value="receive" selected>Receive</option>
+        <option value="spend">Spend</option>
+        {{#if hasGM}}
+          <option value="transfer">Transfer</option>
+        {{/if}}
+      </select>
+    </div>
   </fieldset>
 
   <fieldset class="transfer">

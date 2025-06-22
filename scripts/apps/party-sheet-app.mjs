@@ -14,6 +14,7 @@ import { PcSkillsElement } from '../components/pc-skills.mjs';
 import { PcOriginElement } from '../components/pc-origin.mjs';
 import { FeatureLinkElement } from '../components/feature-link.mjs';
 import { HpMeterElement } from '../components/hp-meter.mjs';
+import { getFolderActors } from '../lib/utils.mjs';
 
 // @ts-expect-error wrong typings?
 export class PartySheetApp extends Application {
@@ -376,5 +377,13 @@ export class PartySheetApp extends Application {
     app.registerHooks();
 
     return app;
+  }
+
+  /**
+   * @param {string} folderId
+   */
+  static async showPartySheetForFolder(folderId) {
+    const {actors, partyData} = getFolderActors(folderId);
+    return PartySheetApp.showApp({actors, folderId, partyData});
   }
 }

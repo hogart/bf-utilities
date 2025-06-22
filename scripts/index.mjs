@@ -2,11 +2,14 @@ import { grantXp, grantXpAfterBattle } from './dialogs/grant-xp.mjs';
 import { distributeCurrency } from './dialogs/distribute-currency.mjs';
 import { MODULE_ID } from './lib/module-id.mjs';
 import { getPcActors } from './lib/actor.mjs';
-import { getFolderActors, isPc } from './lib/utils.mjs';
+import { isPc } from './lib/utils.mjs';
 import { PartySheetApp } from './apps/party-sheet-app.mjs';
 import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
 import { registerSettings, getSetting, SHOW_PARTY_SHEET_BUTTON, SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET, SHOW_XP_AFTER_BATTLE } from './lib/settings.mjs';
 import { registerHandlebarsHelpers } from './lib/tpl.mjs';
+import { un$ } from './lib/un$.mjs';
+import { CurrencyManagementBtnElement } from './components/currency-management-btn.mjs';
+import { ShowPartySheetBtnElement } from './components/show-party-sheet-btn.mjs';
 
 function injectModuleApi() {
   if (!MODULE_ID) {
@@ -28,8 +31,7 @@ function injectModuleApi() {
        * @param {string} folderId
        */
       async showPartySheetForFolder(folderId) {
-        const {actors, partyData} = getFolderActors(folderId);
-        return PartySheetApp.showApp({actors, folderId, partyData});
+        return PartySheetApp.showPartySheetForFolder(folderId);
       },
       async showCurrencyManagement(actor = game.user?.character) {
         if (actor) {
@@ -47,7 +49,7 @@ function injectModuleApi() {
 
 /**
  * @param {unknown} _app
- * @param {JQuery<HTMLElement>} $html
+ * @param {JQuery<HTMLElement> | HTMLElement} $html
  * @param {PCSheetData} _data
  */
 async function injectCurrencyButton(_app, $html, _data) {
@@ -59,22 +61,14 @@ async function injectCurrencyButton(_app, $html, _data) {
     return;
   }
 
-  const targetCell = $html.find('tbody[data-section="currency"] tr td.name');
-  if (targetCell.find('.currency-management').length > 0) {
+  const targetCell = un$($html)?.querySelector('tbody[data-section="currency"] tr td.name');
+  if (targetCell?.querySelector('bfu-currency-management-btn') || !targetCell) {
     return;
   }
 
-  const $currencyManagement = $(
-    `<a class="currency-management">
-      <i class="fas fa-coins" title="Manage currency"></i>
-    </a>`,
-  );
+  CurrencyManagementBtnElement.register();
 
-  $currencyManagement.on('click', async () => {
-    CurrencyManagementApp.showApp({actor: _data.actor});
-  });
-
-  targetCell.append($currencyManagement);
+  targetCell.innerHTML += `<bfu-currency-management-btn actor-id="${_data.actor.id}"></bfu-currency-management-btn>`;
 }
 
 /**
@@ -82,12 +76,12 @@ async function injectCurrencyButton(_app, $html, _data) {
  * @param {JQuery<HTMLElement>} $html
  */
 function injectPartySheetButton(_app, $html) {
-  if (/** @type number*/(getSetting(SHOW_PARTY_SHEET_BUTTON)) > (game.user?.role ?? 1)) {
+  if (/** @type number */(getSetting(SHOW_PARTY_SHEET_BUTTON)) > (game.user?.role ?? 1)) {
     return;
   }
 
-  $html.find('.folder').each((_index, folderElement) => {
-    const folderId = folderElement.dataset.folderId;
+  un$($html)?.querySelectorAll('.folder').forEach((folderElement) => {
+    const folderId = /** @type HTMLElement */(folderElement).dataset.folderId;
     if (!folderId) {
       return;
     }
@@ -103,26 +97,17 @@ function injectPartySheetButton(_app, $html) {
       return;
     }
 
-    const $folder = $(folderElement);
-
     // Avoid duplicate icons
-    if ($folder.find('.party-sheet-button').length > 0) {
+    if (folderElement.querySelector('bfu-show-party-sheet-btn')) {
       return;
     }
 
-    // Create and append the icon
-    const button = $(
-      `<a class="create-button party-sheet-button">
-        <i class="fas fa-users" title="Party sheet"></i>
-      </a>`,
-    );
-    $folder.find('h3.noborder').append(button);
+    ShowPartySheetBtnElement.register();
 
-    button.on('click', (event) => {
-      event.stopImmediatePropagation();
-      const {actors, partyData} = getFolderActors(folder);
-      PartySheetApp.showApp({actors, folderId: folder._id, partyData});
-    });
+    const folderHeader = folderElement.querySelector('.folder-header');
+    if (folderHeader) {
+      folderHeader.innerHTML += `<bfu-show-party-sheet-btn folder-id="${folderId}"></bfu-show-party-sheet-btn>`;
+    }
   });
 }
 

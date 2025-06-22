@@ -1,3 +1,5 @@
+import { NotEnoughMoneyError, spendCoinage } from './currency.mjs';
+
 // TODO: fetch from compendium
 export const currencyList = [
   {name: 'platinum', label: 'Platinum (pp):', img: 'icons/commodities/currency/coin-embossed-skull-silver.webp'},
@@ -96,4 +98,22 @@ export async function getActorCoinage(actor) {
     sp: (await getActorCurrency(actor, 'sp'))?.system.quantity || 0,
     cp: (await getActorCurrency(actor, 'cp'))?.system.quantity || 0,
   };
+}
+
+/**
+ * @param {BlackFlagActor} from
+ * @param {BlackFlagActor} to
+ * @param {Coinage} coinage
+ */
+export async function transferCurrency(from, to, coinage) {
+  const actorCoinage = await getActorCoinage(from);
+
+  try {
+    const newCoinage = spendCoinage(actorCoinage, coinage);
+    await upsertActorCoinage(/** @type BlackFlagActor */(to), newCoinage, 'update');
+  } catch (e) {
+    if (e instanceof NotEnoughMoneyError) {
+      ui.notifications?.error('You do not have enough money to transfer.');
+    }
+  }
 }
