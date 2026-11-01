@@ -9,16 +9,18 @@
   "homepage": "https://github.com/hogart/bf-utilities",
   "description": "Various utilities for Black Flag Roleplaying System: party sheet, currency management, XP and currency reward",
   "license": "MIT",
-
   "devDependencies": {
-    "@league-of-foundry-developers/foundry-vtt-types": "^12.331.1-beta",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^10.0.1",
     "@types/jquery": "^3.5.32",
-    "@typescript-eslint/eslint-plugin": "^8.29.0",
-    "@typescript-eslint/parser": "^8.29.0",
-    "ava": "^6.2.0",
-    "eslint": "^9.23.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
+    "ava": "^5.3.1",
+    "eslint": "^10.14.0",
+    "fvtt-types": "npm:@league-of-foundry-developers/foundry-vtt-types@^13.340.1",
+    "globals": "^17.13.0",
     "husky": "^9.1.7",
-    "typescript": "^5.8.2"
+    "typescript": "^6.0.3"
   },
   "type": "module",
   "scripts": {

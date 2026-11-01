@@ -1,15 +1,31 @@
-import type { EmbeddedCollection } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.d.mts';
+export {};
+
+declare module 'fvtt-types/configuration' {
+  interface SourceConfig {
+    Actor: {
+      pc: Record<string, unknown>,
+    },
+    Item: Record<string, BlackFlagItem['system']>,
+  }
+
+  interface FlagConfig {
+    Actor: {
+      'bf-utilities': Record<string, unknown>,
+      [scope: string]: Record<string, unknown>,
+    },
+  }
+}
 
 declare global {
-  interface BlackFlagItem extends Item {
+  type BlackFlagItem = Item & {
     system: {
       identifier: string,
       quantity: number,
     },
-  }
+  };
 
-  interface BlackFlagActor extends Actor {
-    items: EmbeddedCollection<BlackFlagItem, BlackFlagActor>,
+  type BlackFlagActor = Actor & {
+    items: foundry.abstract.EmbeddedCollection<BlackFlagItem, BlackFlagActor>,
     system: {
       attributes: {
         ac: {
@@ -58,7 +74,7 @@ declare global {
         senses: {
           label: string,
         },
-        size: 'tiny' | 'small' | 'medium' | 'large' | 'huge' | 'gargantuan'
+        size?: 'tiny' | 'small' | 'medium' | 'large' | 'huge' | 'gargantuan',
         type: {
           label: string,
         },
@@ -93,7 +109,7 @@ declare global {
 
       addLuck: () => Promise<void>,
     },
-  }
+  };
 
   interface BlackFlagTokenDocument extends TokenDocument {
     actor: BlackFlagActor;
@@ -122,6 +138,20 @@ declare global {
     proficiencyLevel: ProficiencyLevel,
   }
 
+  interface ActorTplItem {
+    name: string,
+    _id: string,
+  }
+
+  interface PartySheetData {
+    isGM: boolean,
+    actors: ActorTplData[],
+    enableGrantXp: boolean,
+    enableDistributeCurrency: boolean,
+    enableDoomPoints: boolean,
+    doomPoints: number | null,
+  }
+
   interface ActorTplData {
     _id: BlackFlagActor['_id'],
     img: BlackFlagActor['img'],
@@ -144,17 +174,16 @@ declare global {
     classes: ActorTplClass[],
     skills: ActorTplSkill[],
     highestSkills: ActorTplHighSkill[],
-    xp: BlackFlagActor['system']['progression']['xp'],
-    background: BlackFlagActor['system']['progression']['background'],
-    heritage: BlackFlagActor['system']['progression']['heritage'],
-    lineage: BlackFlagActor['system']['progression']['lineage'],
+    background: ActorTplItem | null,
+    heritage: ActorTplItem | null,
+    lineage: ActorTplItem | null,
     coinage: string,
     wealth: string,
     senses: BlackFlagActor['system']['progression']['traits']['senses']['label'] | null,
     type: BlackFlagActor['system']['progression']['traits']['type']['label'] | null,
     size: BlackFlagActor['system']['progression']['traits']['size'] | null,
     movement: string | null,
-    talents: BlackFlagItem[],
+    talents: (ActorTplItem | null)[],
 
     isOwner: boolean,
   }
@@ -188,10 +217,4 @@ declare global {
     };
   }
 
-  interface Window {
-    dragRuler?: {
-      registerModule: (moduleId: string, api: Constructor) => void;
-      [key: string]: unknown;
-    };
-  }
 }

@@ -9,8 +9,8 @@
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "NodeNext",
-    "types": ["@league-of-foundry-developers/foundry-vtt-types", "@types/jquery", "./types.d.ts"],
+    "types": ["fvtt-types/lenient", "@types/jquery"],
   },
-  "include": ["scripts/**/*.mjs"],
+  "include": ["scripts/**/*.mjs", "types.d.ts"],
   "exclude": ["node_modules"]
 }
