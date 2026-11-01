@@ -56,6 +56,8 @@ export class BaseElement extends HTMLElement {
       return;
     }
 
+    this.#removeEventDelegates();
+
     const handlersByType = new Map();
 
     for (const key of Object.keys(events)) {
@@ -174,6 +176,10 @@ export class BaseElement extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this.#removeEventDelegates();
+  }
+
+  #removeEventDelegates() {
     for (const [type, handler] of this.#boundEventDelegates.entries()) {
       this.removeEventListener(type, handler);
     }

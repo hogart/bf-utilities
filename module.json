@@ -5,8 +5,8 @@
   "authors": [
     {
       "name": "Konstantin Kitmanov",
-      "url": "https://kitmanov.name",
-      "email": "me@kitmanov.name",
+      "url": "https://HogartTheRogue.kitmanov.name",
+      "email": "HogartTheRogue@kitmanov.name",
       "discord": "hogart"
     }
   ],
@@ -17,14 +17,15 @@
 
   "manifest": "https://github.com/hogart/bf-utilities/releases/latest/download/module.json",
   "download": "https://github.com/hogart/bf-utilities/releases/latest/download/bf-utilities.zip",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "compatibility": {
-    "minimum": "12",
+    "minimum": "13",
     "verified": "13"
   },
   "esmodules": [
     "scripts/index.mjs"
   ],
+  "socket": true,
   "styles": [
     "styles/bf-utilities.css"
   ],
@@ -34,13 +35,11 @@
         "mjs",
         "js",
         "json",
-        "css",
-        "hbs"
+        "css"
       ],
       "paths": [
         "styles",
-        "scripts",
-        "templates"
+        "scripts"
       ]
     }
   },
@@ -51,7 +50,7 @@
         "id": "black-flag",
         "type": "system",
         "compatibility": {
-          "minimum": "1.1.057"
+          "minimum": "2.0.074"
         }
       }
     ]

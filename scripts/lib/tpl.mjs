@@ -11,11 +11,11 @@ export function getPath(template) {
 
 /**
  * Escape quotes and special HTML chars
- * @param {string} str
+ * @param {unknown} str
  * @returns {string}
  */
-function escapeHtml(str) {
-  return str
+export function escapeHtml(str) {
+  return String(str ?? '')
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;')

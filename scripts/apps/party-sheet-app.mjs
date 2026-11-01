@@ -5,19 +5,22 @@ import { moduleBus } from '../lib/module-bus.mjs';
 import { coinageToGold, coinageToStrings, coinageToWealth } from '../lib/currency.mjs';
 import { firstToUpper } from '../lib/first-to-upper.mjs';
 import { getSetting, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_DOOM_POINTS, SHOW_GRANT_XP_BUTTON, USE_GP_WEALTH } from '../lib/settings.mjs';
-import { getPath } from '../lib/tpl.mjs';
 import { CurrencyManagementApp } from './currency-management-app.mjs';
 import { manageActorFlag } from '../lib/actor.mjs';
-import { DoomPointsElement } from '../components/doom-points.mjs';
-import { PcPortraitElement } from '../components/pc-portrait.mjs';
-import { PcSkillsElement } from '../components/pc-skills.mjs';
-import { PcOriginElement } from '../components/pc-origin.mjs';
-import { FeatureLinkElement } from '../components/feature-link.mjs';
-import { HpMeterElement } from '../components/hp-meter.mjs';
+import { PartySheetElement } from '../components/party-sheet.mjs';
 import { getFolderActors } from '../lib/utils.mjs';
 
-// @ts-expect-error wrong typings?
-export class PartySheetApp extends Application {
+const {ApplicationV2} = foundry.applications.api;
+
+/**
+ * @param {{name?: string | null, _id?: string | null} | null | undefined} item
+ * @returns {{name: string, _id: string} | null}
+ */
+function slimItem(item) {
+  return item ? {name: item.name ?? '', _id: item._id ?? ''} : null;
+}
+
+export class PartySheetApp extends ApplicationV2 {
   /**
    * @param {{ actors: BlackFlagActor[]; folderId?: string; partyData?: BlackFlagActor}} params
    */
@@ -28,14 +31,6 @@ export class PartySheetApp extends Application {
     this.folderId = params.folderId;
     /** @type BlackFlagActor | undefined*/
     this.partyData = params.partyData;
-
-    DoomPointsElement.register();
-    PcPortraitElement.register();
-    PcSkillsElement.register();
-    PcOriginElement.register();
-    FeatureLinkElement.register();
-    PcOriginElement.register();
-    HpMeterElement.register();
   }
 
   /**
@@ -43,17 +38,26 @@ export class PartySheetApp extends Application {
    */
   #unsubscribers = [];
 
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions || {}, {
-      baseApplication: '',
+  /**
+   * @type Array<{event: string, id: number}>
+   */
+  #hookIds = [];
+
+  /** @type {PartySheetElement | null} */
+  #sheet = null;
+
+  static DEFAULT_OPTIONS = {
+    id: 'party-sheet-app',
+    classes: ['bf-utilities', 'party-sheet-app'],
+    window: {
       title: 'Party Sheet',
-      id: 'party-sheet-app',
-      template: getPath('party-sheet'),
-      width: 640,
-      height: 'auto',
       resizable: true,
-    });
-  }
+    },
+    position: {
+      width: 640,
+      height: /** @type {'auto'} */ ('auto'),
+    },
+  };
 
   /**
    * @param {BlackFlagActor} actor
@@ -128,16 +132,15 @@ export class PartySheetApp extends Application {
       classes,
       skills,
       highestSkills: [],
-      xp: actor.system.progression.xp,
-      background: actor.system.progression.background,
-      heritage: actor.system.progression.heritage,
-      lineage: actor.system.progression.lineage,
+      background: slimItem(actor.system.progression.background),
+      heritage: slimItem(actor.system.progression.heritage),
+      lineage: slimItem(actor.system.progression.lineage),
       ...coinageAndWealth,
       senses: actor.system.traits.senses.label ? actor.system.traits.senses.label : null,
       type: actor.system.traits.type.label !== 'Humanoid' ? actor.system.traits.type.label : null,
-      size: actor.system.traits.size !== 'medium' ? firstToUpper(actor.system.traits.size) : null,
+      size: actor.system.traits.size !== 'medium' ? firstToUpper(actor.system.traits.size ?? 'medium') : null,
       movement: this.#actorMovement(actor),
-      talents: actor.items.filter(i => i.type === 'talent'),
+      talents: actor.items.filter(i => i.type === 'talent').map(slimItem),
 
       isOwner: actor.id === game.user?.character?.id,
     };
@@ -158,6 +161,9 @@ export class PartySheetApp extends Application {
     };
   }
 
+  /**
+   * @returns {Promise<PartySheetData>}
+   */
   async getData() {
     const actors = await Promise.all(this.actors.map(this.#actorViewModel, this));
 
@@ -202,46 +208,90 @@ export class PartySheetApp extends Application {
       ? (
         this.partyData
           ? manageActorFlag(this.partyData, 'doomPoints') ?? 0
-          : NaN
+          : null
       )
       : 0;
 
     return {
       isGM: !!game.user?.isGM,
       actors,
-      enableGrantXp: getSetting(SHOW_GRANT_XP_BUTTON),
-      enableDistributeCurrency: getSetting(SHOW_DISTRIBUTE_CURRENCY_BUTTON),
-      enableDoomPoints,
-      doomPoints,
+      enableGrantXp: !!getSetting(SHOW_GRANT_XP_BUTTON),
+      enableDistributeCurrency: !!getSetting(SHOW_DISTRIBUTE_CURRENCY_BUTTON),
+      enableDoomPoints: !!enableDoomPoints,
+      doomPoints: /** @type {number | null} */ (doomPoints),
     };
   }
 
   /**
-   * @param {JQuery<HTMLElement>} html
+   * @param {any} _options
    */
-  activateListeners(html) {
-    super.activateListeners(html);
+  async _prepareContext(_options) {
+    return /** @type {any} */ (this.getData());
+  }
 
-    html.on('click', '[data-open-sheet]', (event) => {
-      const actor = this.actors[event.currentTarget.dataset.openSheet];
+  /**
+   * @param {any} context
+   * @returns {Promise<HTMLElement>}
+   */
+  async _renderHTML(context) {
+    PartySheetElement.register();
+
+    if (!this.#sheet) {
+      this.#sheet = this.#createSheet();
+    }
+    this.#sheet.setAttribute('data', JSON.stringify(context));
+
+    return this.#sheet;
+  }
+
+  /**
+   * @param {HTMLElement} result
+   * @param {HTMLElement} content
+   */
+  _replaceHTML(result, content) {
+    // Re-attaching the element would needlessly re-render it
+    if (result.parentElement !== content) {
+      content.replaceChildren(result);
+    }
+  }
+
+  /**
+   * @returns {PartySheetElement}
+   */
+  #createSheet() {
+    const sheet = /** @type {PartySheetElement} */ (document.createElement('bfu-party-sheet'));
+
+    sheet.addEventListener('opensheet', (event) => {
+      const actorId = /** @type {CustomEvent<string>} */(event).detail;
+      this.#findActor(actorId)?.sheet?.render(true);
+    });
+
+    sheet.addEventListener('luck', (event) => {
+      if (!game.user?.isGM) {
+        return;
+      }
+      const {actorId, delta} = /** @type {CustomEvent<{actorId: string, delta: number}>} */(event).detail;
+      const actor = this.#findActor(actorId);
+      if (!actor) {
+        return;
+      }
+      const currentLuck = actor.system.attributes.luck.value;
+      if (delta < 0 && currentLuck > 0) {
+        actor.update({system: {attributes: {luck: {value: currentLuck - 1}}}});
+      } else if (delta > 0 && currentLuck < CONFIG.BlackFlag.luck.max) {
+        actor.system.addLuck();
+      }
+    });
+
+    sheet.addEventListener('managecurrency', (event) => {
+      const actor = this.#findActor(/** @type {CustomEvent<string>} */(event).detail);
       if (actor) {
-        actor.sheet?.render(true); // Open the actor's sheet
+        CurrencyManagementApp.showApp({actor});
       }
     });
 
-    html.on('click', '[data-open-item]', (event) => {
-      const _id = event.currentTarget.dataset.openItem;
-      const actor = this.actors[event.currentTarget.dataset.actorIndex];
-      const item = actor.items.get(_id);
-      if (item) {
-        item.sheet?.render(true); // Open the item's sheet
-      } else {
-        console.warn('Item not found for ID:', _id);
-      }
-    });
-
-    html.on('click', '[data-action]', (event) => {
-      const action = event.currentTarget.dataset.action;
+    sheet.addEventListener('partyaction', (event) => {
+      const action = /** @type {CustomEvent<string>} */(event).detail;
 
       if (action === 'distribute-currency') {
         distributeCurrency(this.actors);
@@ -252,118 +302,104 @@ export class PartySheetApp extends Application {
       }
     });
 
-    html.on('click', '[data-remove-luck]', (event) => {
-      if (!game.user?.isGM) {
-        return;
-      }
-      const actor = this.actors[event.currentTarget.dataset.removeLuck];
-      const currentLuck = actor.system.attributes.luck.value;
-      if (currentLuck > 0) {
-        actor.update({system: {attributes: {luck: {value: currentLuck - 1}}}});
+    sheet.addEventListener('doom', (event) => {
+      manageActorFlag(this.partyData, 'doomPoints', /** @type {CustomEvent<{points: number}>} */(event).detail.points);
+    });
+
+    sheet.addEventListener('openfeature', (event) => {
+      const targetEl = /** @type {HTMLElement} */(event.target);
+      const itemId = /** @type {string} */(/** @type {CustomEvent} */(event).detail);
+      const actorId = /** @type {HTMLElement | null} */(targetEl.closest('[data-actor-id]'))?.dataset.actorId;
+      const item = this.#findActor(actorId)?.items.get(itemId);
+      if (item) {
+        item.sheet?.render(true);
+      } else {
+        console.warn('Item not found for ID:', itemId);
       }
     });
 
-    html.on('click', '[data-grant-luck]', (event) => {
-      if (!game.user?.isGM) {
-        return;
-      }
-      const actor = this.actors[event.currentTarget.dataset.grantLuck];
-      const currentLuck = actor.system.attributes.luck.value;
-      if (currentLuck < CONFIG.BlackFlag.luck.max) {
-        actor.system.addLuck();
-      }
-    });
-
-    html.on('click', '[data-manage-currency]', (event) => {
-      const actor = this.actors[event.currentTarget.dataset.manageCurrency];
-      CurrencyManagementApp.showApp({actor});
-    });
-
-    html.on(
-      // @ts-expect-error jQuery doesn't really work with custom events
-      'doom',
-      'bfu-doom-points',
-      (/** @type {CustomEvent<{points: number}>} */event) => {
-        manageActorFlag(this.partyData, 'doomPoints', event.detail.points);
-      },
-    );
-
-    html.on(
-      // @ts-expect-error jQuery doesn't really work with custom events
-      'opensheet',
-      '[data-open-sheet]',
-      (/** @type {CustomEvent<BlackFlagActor['_id']>} */event) => {
-        const actor = this.actors.find(a => a._id === event.detail);
-        if (actor) {
-          actor.sheet?.render(true);
-        }
-      },
-    );
-
-    html.on(
-      // @ts-expect-error jQuery doesn't really work with custom events
-      'openfeature',
-      'bfu-feature-link',
-      (/** @type {CustomEvent<BlackFlagActor['_id']>} */event) => {
-        const targetEl = /** @type {HTMLElement} */(event.target);
-        const itemId = /** @type {string} */(event.detail);
-        const actorIdEl = /** @type {HTMLElement} */(targetEl?.closest('[data-actor-id]'));
-        const actorId = actorIdEl?.dataset.actorId;
-        const actor = this.actors.find(a => a._id === actorId);
-        const item = actor?.items.get(itemId);
-        if (item) {
-          item.sheet?.render(true); // Open the item's sheet
-        } else {
-          console.warn('Item not found for ID:', itemId);
-        }
-      },
-    );
-
-    this.#unsubscribers.push(
-      moduleBus.listenSettingChange(SHOW_GRANT_XP_BUTTON, (newValue) => {
-        html.toggleClass('enable-grant-xp', /** @type boolean */(newValue));
-      }),
-    );
-
-    this.#unsubscribers.push(
-      moduleBus.listenSettingChange(SHOW_DISTRIBUTE_CURRENCY_BUTTON, (newValue) => {
-        html.toggleClass('enable-distribute-currency', /** @type boolean */(newValue));
-      }),
-    );
-
-    this.#unsubscribers.push(
-      moduleBus.listenSettingChange(SHOW_DOOM_POINTS, (newValue) => {
-        html.toggleClass('enable-doom-points', /** @type boolean */(newValue));
-      }),
-    );
+    return sheet;
   }
 
   /**
-   * @param {Application.CloseOptions} options
+   * @param {string | undefined} actorId
+   * @returns {BlackFlagActor | undefined}
    */
-  async close(options) {
-    for (const unsubscribe of this.#unsubscribers) {
+  #findActor(actorId) {
+    return this.actors.find(a => a._id === actorId);
+  }
+
+  /**
+   * @param {any} context
+   * @param {any} options
+   */
+  async _onFirstRender(context, options) {
+    await super._onFirstRender(context, options);
+
+    for (const setting of [SHOW_GRANT_XP_BUTTON, SHOW_DISTRIBUTE_CURRENCY_BUTTON, SHOW_DOOM_POINTS]) {
+      this.#unsubscribers.push(
+        moduleBus.listenSettingChange(setting, () => this.render(false)),
+      );
+    }
+  }
+
+  /**
+   * @param {any} options
+   */
+  _onClose(options) {
+    this.#unsubscribe();
+    this.#unregisterHooks();
+
+    super._onClose(options);
+  }
+
+  #unsubscribe() {
+    for (const unsubscribe of this.#unsubscribers.splice(0)) {
       unsubscribe();
     }
+  }
 
-    return super.close(options);
+  #unregisterHooks() {
+    clearTimeout(this.#renderTimer);
+    for (const {event, id} of this.#hookIds.splice(0)) {
+      Hooks.off(event, id);
+    }
+  }
+
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  #renderTimer;
+
+  // A single transaction updates several items, so coalesce the re-renders
+  #scheduleRender() {
+    clearTimeout(this.#renderTimer);
+    this.#renderTimer = setTimeout(() => this.render(false), 50);
   }
 
   registerHooks() {
-    Hooks.on('updateActor', (/** @type BlackFlagActor */actor) => {
+    this.#hookIds.push({event: 'updateActor', id: Hooks.on('updateActor', (/** @type BlackFlagActor */actor) => {
       // Check if the actor belongs to the tracked folder
       if (actor.folder?.id === this.folderId) {
-        this.render(false);
+        this.#scheduleRender();
       }
-    });
+    })});
+
+    // Coins, talents, attunement etc. are embedded items, changing them doesn't trigger updateActor
+    for (const event of ['createItem', 'updateItem', 'deleteItem']) {
+      this.#hookIds.push({event, id: Hooks.on(event, (/** @type BlackFlagItem */item) => {
+        const parent = item.parent;
+        if (parent && this.actors.some(actor => actor.id === parent.id)) {
+          this.#scheduleRender();
+        }
+      })});
+    }
 
     if (this.folderId) {
-      Hooks.on('updateFolder', (/** @type Folder */folder) => {
+      this.#hookIds.push({event: 'updateFolder', id: Hooks.on('updateFolder', (/** @type Folder */folder) => {
         // Check if the folder matches the tracked folder ID
         if (folder.id === this.folderId) {
-          this.render(false);
+          this.#scheduleRender();
         }
-      });
+      })});
     }
   }
 
@@ -373,7 +409,7 @@ export class PartySheetApp extends Application {
    */
   static async showApp(params) {
     const app = new PartySheetApp(params);
-    app.render(true);
+    void app.render(true);
     app.registerHooks();
 
     return app;

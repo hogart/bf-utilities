@@ -18,7 +18,7 @@ export function getPcActors(fromCanvasOnly = false) {
       /** @type BlackFlagActor[] */([]),
     ) ?? [];
   }
-  const actors = /** @type BlackFlagActor[]|undefined */(game.actors);
+  const actors = /** @type BlackFlagActor[]|undefined */(game.actors?.contents);
   return actors?.filter(isPc) || [];
 }
 
@@ -84,7 +84,6 @@ export function manageActorFlag(actor, key, value) {
   if (arguments.length === 2) {
     return actor.getFlag(MODULE_ID, key);
   } else {
-    // @ts-expect-error incorrect typings
     return actor.setFlag(MODULE_ID, key, value);
   }
 }

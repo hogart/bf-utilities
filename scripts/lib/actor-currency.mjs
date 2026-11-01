@@ -45,7 +45,6 @@ async function getActorCurrency(actor, currencyIdentifier) {
   const actorItems = actor.items;
 
   let currencyItem = actorItems.find((item) => {
-    // @ts-expect-error BlackFlag typings are incomplete
     return item.type === 'currency' && item.system.identifier.value === currencyIdentifier;
   });
 
@@ -53,7 +52,7 @@ async function getActorCurrency(actor, currencyIdentifier) {
     const currencyCompendiumItem = await getCurrencyItemFromCompendium(currencyIdentifier);
 
     if (currencyCompendiumItem) {
-      const inserted = /** @type BlackFlagItem[]|undefined */(await actor.createEmbeddedDocuments('Item', [currencyCompendiumItem.toObject()]));
+      const inserted = /** @type BlackFlagItem[]|undefined */(await actor.createEmbeddedDocuments('Item', [/** @type {Item.CreateData} */ (currencyCompendiumItem.toObject())]));
       currencyItem = inserted?.[0];
     }
   }
@@ -101,19 +100,25 @@ export async function getActorCoinage(actor) {
 }
 
 /**
+ * Moves coinage from one actor to another. Must run as a user with update rights on both actors.
  * @param {BlackFlagActor} from
  * @param {BlackFlagActor} to
  * @param {Coinage} coinage
+ * @returns {Promise<boolean>}
  */
 export async function transferCurrency(from, to, coinage) {
   const actorCoinage = await getActorCoinage(from);
 
   try {
-    const newCoinage = spendCoinage(actorCoinage, coinage);
-    await upsertActorCoinage(/** @type BlackFlagActor */(to), newCoinage, 'update');
+    const remainder = spendCoinage(actorCoinage, coinage);
+    await upsertActorCoinage(from, remainder, 'set');
+    await upsertActorCoinage(to, coinage, 'update');
+    return true;
   } catch (e) {
     if (e instanceof NotEnoughMoneyError) {
       ui.notifications?.error('You do not have enough money to transfer.');
+      return false;
     }
+    throw e;
   }
 }

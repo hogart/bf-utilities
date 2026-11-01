@@ -1,27 +1,31 @@
 import { _actorReceivedCoinageString, divideCurencyWithExchange, divideCurrencyInWilderness } from '../lib/currency.mjs';
 import { notifyActorOwner } from '../lib/utils.mjs';
-import { getPath, render } from '../lib/tpl.mjs';
 import { getPcActors, getSelectedActors } from '../lib/actor.mjs';
-import { currencyList, upsertActorCoinage } from '../lib/actor-currency.mjs';
-import { CurrencyInputElement } from '../components/currency-input.mjs';
-import { ActorSelectorElement } from '../components/actor-selector.mjs';
+import { upsertActorCoinage } from '../lib/actor-currency.mjs';
+import { escapeHtml } from '../lib/tpl.mjs';
+import { DistributeCurrencyElement } from '../components/distribute-currency.mjs';
 
 export async function distributeCurrency(actors = getPcActors(true)) {
-  ActorSelectorElement.register();
-  CurrencyInputElement.register();
-  loadTemplates([
-    getPath('distribute-currency'),
-  ]);
+  DistributeCurrencyElement.register();
 
-  return new Dialog({
-    'title': 'Distribute Currency',
-    'content': await render('distribute-currency', {actors, currencies: currencyList}),
-    'buttons': {
-      distribute: {
-        label: 'Distribute',
-        callback(html) {
-          const $html = /** @type {JQuery} */ (html);
-          const form = $html[0]; // de-jqueryify!
+  const actorsAttr = escapeHtml(JSON.stringify(actors.map(({id, name, img}) => ({id, name, img}))));
+
+  const content = document.createElement('div');
+  content.innerHTML = `<bfu-distribute-currency actors="${actorsAttr}"></bfu-distribute-currency>`;
+
+  return new foundry.applications.api.DialogV2({
+    window: {title: 'Distribute Currency'},
+    content,
+    buttons: [
+      {
+        'action': 'distribute',
+        'label': 'Distribute',
+        'default': true,
+        callback(_event, button) {
+          const form = button.form;
+          if (!form) {
+            return;
+          }
 
           const pp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="platinum"]')).valueAsNumber;
           const gp = /** @type {HTMLInputElement} */ (form.querySelector('input[name="gold"]')).valueAsNumber;
@@ -36,14 +40,13 @@ export async function distributeCurrency(actors = getPcActors(true)) {
           );
         },
       },
-      cancel: {
+      {
+        action: 'cancel',
         label: 'Cancel',
       },
-    },
-    'default': 'distribute',
-  }).render(true);
+    ],
+  }).render({force: true});
 }
-
 /**
  * @param {Coinage} coinage
  * @param {BlackFlagActor[]} selectedActors

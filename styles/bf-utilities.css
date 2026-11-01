@@ -144,7 +144,7 @@
     flex-direction: row;
     gap: 1rem;
 
-    .luck {
+    a.luck {
       pointer-events: none;
 
       &.active {

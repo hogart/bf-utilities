@@ -1,44 +1,43 @@
 import { notifyActorOwner } from '../lib/utils.mjs';
-import { getPath, render } from '../lib/tpl.mjs';
 import { getPcActors, getSelectedActors } from '../lib/actor.mjs';
 import { canvasToXp } from '../lib/canvas-to-xp.mjs';
-import { ActorSelectorElement } from '../components/actor-selector.mjs';
-import { xpTable } from '../lib/cr-table.mjs';
-import { CrEntryElement } from '../components/cr-entry.mjs';
+import { escapeHtml } from '../lib/tpl.mjs';
+import { GrantXpElement } from '../components/grant-xp.mjs';
 
 /**
  *
  * @param {BlackFlagActor[]} actors
  * @param {{cr: string, count: number}[]} battleFieldXp
- * @returns {Promise<Dialog>}
+ * @returns {Promise<foundry.applications.api.DialogV2>}
  */
 export async function grantXp(actors = getPcActors(true), battleFieldXp = []) {
-  ActorSelectorElement.register();
-  CrEntryElement.register();
+  GrantXpElement.register();
 
-  loadTemplates([
-    getPath('grant-xp'),
-  ]);
+  const actorsAttr = escapeHtml(JSON.stringify(actors.map(({id, name, img}) => ({id, name, img}))));
+  const xpAttr = escapeHtml(JSON.stringify(battleFieldXp));
 
-  const content = await render('grant-xp', {actors, xpTable, battleFieldXp});
+  const content = document.createElement('div');
+  content.innerHTML = `<bfu-grant-xp actors="${actorsAttr}" battlefield-xp="${xpAttr}"></bfu-grant-xp>`;
 
-  // @ts-expect-error wrong typings?
-  return new Dialog({
-    'title': 'Grant XP',
-    'content': content,
-    'buttons': {
-      grant: {
-        label: 'Grant XP',
-        callback: (html) => {
-          const $html = /** @type {JQuery} */ (html);
-
-          const form = $html[0]; // de-jqueryify!
+  return new foundry.applications.api.DialogV2({
+    window: {title: 'Grant XP'},
+    content,
+    buttons: [
+      {
+        'action': 'grant',
+        'label': 'Grant XP',
+        'default': true,
+        'callback': (_event, button) => {
+          const form = button.form;
+          if (!form) {
+            return;
+          }
           const selectedActors = getSelectedActors(actors, form);
 
           const plainXp = /** @type {HTMLInputElement} */ (form.querySelector('[name="plainXp"]')).valueAsNumber || 0;
           let totalEncounterXP = 0;
           form.querySelectorAll('bfu-cr-entry').forEach((element) => {
-            totalEncounterXP += /** @type {CrEntryElement} */(element).value;
+            totalEncounterXP += /** @type {import('../components/cr-entry.mjs').CrEntryElement} */(element).value;
           });
 
           // Final XP to distribute
@@ -50,22 +49,12 @@ export async function grantXp(actors = getPcActors(true), battleFieldXp = []) {
           assignXp(xpPerActor, selectedActors, source);
         },
       },
-      cancel: {
+      {
+        action: 'cancel',
         label: 'Cancel',
       },
-    },
-    'default': 'grant',
-    render(html) {
-      const $html = /** @type {JQuery} */ (html);
-
-      $html.on('click', '.add-creature-btn', async () => {
-        $html.find('#creature-section').append('<bfu-cr-entry cr="" quantity="0"></bfu-cr-entry>');
-      });
-      $html.on('remove', 'bfu-cr-entry', (event) => {
-        $(event.currentTarget).closest('bfu-cr-entry').remove();
-      });
-    },
-  }).render(true);
+    ],
+  }).render({force: true});
 }
 
 /**

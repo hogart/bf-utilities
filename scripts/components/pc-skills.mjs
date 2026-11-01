@@ -15,8 +15,9 @@ export class PcSkillsElement extends BaseElement {
       flex-wrap: wrap;
       font-size: 10px;
       padding-left: 0;
-      border-top: 1px solid var(--bf-color-border-blue);
-      border-bottom: 1px solid var(--bf-color-border-blue);
+      padding-top: 0.5ch;
+      border-top: 1px solid var(--bf-border-color-blue);
+      border-bottom: 1px solid var(--bf-border-color-blue);
 
       li:has(+ li) {
         margin-right: 1ch;
@@ -26,9 +27,23 @@ export class PcSkillsElement extends BaseElement {
         display: inline-block;
         vertical-align: middle;
 
-        blagFlag-icon {
+        blackFlag-icon {
           height: 10px;
           width: 10px;
+        }
+
+        &:is([data-multiplier="1"], [data-multiplier="2"]) {
+          --top-color: var(--proficient-color);
+          --bottom-color: var(--proficient-color);
+        }
+        &[data-multiplier="2"] {
+          --side-color: var(--proficient-color);
+        }
+        &[data-multiplier="0.5"][data-rounding="up"] {
+          --top-color: var(--proficient-color);
+        }
+        &[data-multiplier="0.5"][data-rounding="down"] {
+          --bottom-color: var(--proficient-color);
         }
       }
     }

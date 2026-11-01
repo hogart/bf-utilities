@@ -17,15 +17,19 @@ export class CurrencyInputElement extends BaseElement {
 
   styles = /* css */`
     .currency-input {
+      margin-bottom: 1ch;
+
       label {
         flex-direction: row;
-        flex: 1;
         align-items: center;
         gap: 1ch;
+        margin-bottom: 0.25ch;
       }
+
       input {
         flex: 1;
       }
+
       img {
         height: 1.2rem;
       }

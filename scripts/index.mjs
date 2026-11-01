@@ -8,6 +8,7 @@ import { CurrencyManagementApp } from './apps/currency-management-app.mjs';
 import { registerSettings, getSetting, SHOW_PARTY_SHEET_BUTTON, SHOW_CURRENCY_BUTTON_IN_CHARACTER_SHEET, SHOW_XP_AFTER_BATTLE } from './lib/settings.mjs';
 import { registerHandlebarsHelpers } from './lib/tpl.mjs';
 import { un$ } from './lib/un$.mjs';
+import { registerCurrencySocket } from './lib/currency-socket.mjs';
 import { CurrencyManagementBtnElement } from './components/currency-management-btn.mjs';
 import { ShowPartySheetBtnElement } from './components/show-party-sheet-btn.mjs';
 
@@ -117,13 +118,9 @@ function onDeleteCombat() {
   }
 }
 
-Hooks.once('dragRuler.ready', async (/** @type {Constructor} */ SpeedProvider) => {
-  const integrate = await import('./integrations/drag-ruler.mjs');
-  integrate.default(SpeedProvider);
-});
-
 Hooks.on('init', injectModuleApi);
 Hooks.once('init', registerSettings);
+Hooks.once('ready', registerCurrencySocket);
 Hooks.on('renderPCSheet', injectCurrencyButton);
 Hooks.on('renderActorDirectory', injectPartySheetButton);
 Hooks.on('deleteCombat', onDeleteCombat);

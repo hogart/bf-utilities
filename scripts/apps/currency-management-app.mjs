@@ -1,14 +1,8 @@
-import { ActorSelectorElement } from '../components/actor-selector.mjs';
-import { CurrencyInputElement } from '../components/currency-input.mjs';
-import { currencyList, getActorCoinage, upsertActorCoinage } from '../lib/actor-currency.mjs';
-import { getPCActorsInSameFolder } from '../lib/actor.mjs';
-import { NotEnoughMoneyError, spendCoinage } from '../lib/currency.mjs';
-import { getActiveGMs } from '../lib/get-active-gms.mjs';
-import { MODULE_ID } from '../lib/module-id.mjs';
-import { getPath } from '../lib/tpl.mjs';
+import { CurrencyManagementElement } from '../components/currency-management.mjs';
 
-// @ts-expect-error wrong typings?
-export class CurrencyManagementApp extends Application {
+const {ApplicationV2} = foundry.applications.api;
+
+export class CurrencyManagementApp extends ApplicationV2 {
   /**
    * @param {{ actor: BlackFlagActor }} params
    */
@@ -18,122 +12,47 @@ export class CurrencyManagementApp extends Application {
     this.actor = params.actor;
   }
 
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions || {}, {
-      baseApplication: '',
+  static DEFAULT_OPTIONS = {
+    id: 'currency-management-app',
+    classes: ['bf-utilities', 'currency-management-app'],
+    window: {
       title: 'Currency Management',
-      id: 'currency-management-app',
-      template: getPath('currency-management'),
-      width: 640,
-      height: 'auto',
       resizable: true,
-    });
-  }
-
-  /**
-   * @param {JQuery<HTMLElement>} html
-   */
-  activateListeners(html) {
-    super.activateListeners(html);
-
-    html.on('submit', this.#onSubmit);
-  }
-
-  #onSubmit = (/** @type {Event} */ event) => {
-    event.preventDefault();
-
-    const formData = new FormData(/** @type HTMLFormElement */(event.target));
-
-    /** @type Coinage */
-    const coinage = {
-      pp: parseFloat(/** @type string */(formData.get('platinum'))),
-      gp: parseFloat(/** @type string */(formData.get('gold'))),
-      sp: parseFloat(/** @type string */(formData.get('silver'))),
-      cp: parseFloat(/** @type string */(formData.get('copper'))),
-    };
-
-    const transaction = /** @type ('receive' | 'spend' | 'transfer') */(formData.get('transaction'));
-
-    if (transaction === 'receive') {
-      this.transactionReceive(coinage);
-    } else if (transaction === 'spend') {
-      this.transactionSpend(coinage);
-    } else if (transaction === 'transfer') {
-      this.transactionTransfer(coinage, /** @type (BlackFlagActor['id'] | null) */(formData.get('actors')));
-    }
+    },
+    position: {
+      width: 640,
+      height: /** @type {'auto'} */ ('auto'),
+    },
   };
 
   /**
-   * @param {Coinage} coinage
+   * @returns {Promise<HTMLElement>}
    */
-  async transactionReceive(coinage) {
-    await upsertActorCoinage(this.actor, coinage);
-  }
+  async _renderHTML() {
+    CurrencyManagementElement.register();
 
-  /**
-   * @param {Coinage} coinage
-   */
-  async transactionSpend(coinage) {
-    const actorCoinage = await getActorCoinage(this.actor);
-
-    try {
-      const newCoinage = spendCoinage(actorCoinage, coinage);
-      await upsertActorCoinage(this.actor, newCoinage, 'set');
-    } catch (e) {
-      if (e instanceof NotEnoughMoneyError) {
-        ui.notifications?.error('You do not have enough money to spend.');
-      }
-    }
-  }
-
-  /**
-   * @param {Coinage} coinage
-   * @param {BlackFlagActor['id'] | null} target
-   */
-  async transactionTransfer(coinage, target) {
-    if (!target) {
-      ui.notifications?.warn('Party member not selected');
-    }
-
-    const targetActor = game.actors?.get(/** @type string */(target));
-    if (!targetActor) {
-      ui.notifications?.error(`Invalid actor id: ${target}`);
-    }
-
-    const activeGmId = getActiveGMs()[0].id;
-
-    game.socket?.emit(`module.${MODULE_ID}`, {
-      type: 'transfer-currency',
-      payload: {},
-      recipients: [activeGmId],
+    const element = document.createElement('bfu-currency-management');
+    element.setAttribute('actor-id', this.actor.id ?? '');
+    element.addEventListener('transactiondone', () => {
+      void this.close();
     });
-
-    const actorCoinage = await getActorCoinage(this.actor);
-
-    try {
-      const newCoinage = spendCoinage(actorCoinage, coinage);
-      await upsertActorCoinage(/** @type BlackFlagActor */(targetActor), newCoinage, 'update');
-    } catch (e) {
-      if (e instanceof NotEnoughMoneyError) {
-        ui.notifications?.error('You do not have enough money to transfer.');
-      }
-    }
+    return element;
   }
 
-  async getData() {
-    return {
-      actor: this.actor,
-      currencies: currencyList,
-      hasGM: !!game.user?.isGM || getActiveGMs().length > 0,
-      fellows: getPCActorsInSameFolder(this.actor).map((actor) => {
-        return {
-          id: actor.id,
-          name: actor.name,
-          img: actor.img,
-          isGM: !!game.user?.isGM,
-        };
-      }),
-    };
+  /**
+   * @param {HTMLElement} result
+   * @param {HTMLElement} content
+   */
+  _replaceHTML(result, content) {
+    content.replaceChildren(result);
+  }
+
+  /*
+   * Keep this as an explicit context hook so the ApplicationV2 lifecycle has a
+   * stable context even though this app renders a custom element directly.
+   */
+  async _prepareContext() {
+    return {};
   }
 
   /**
@@ -141,11 +60,8 @@ export class CurrencyManagementApp extends Application {
    * @returns {Promise<CurrencyManagementApp>}
    */
   static async showApp({actor}) {
-    CurrencyInputElement.register();
-    ActorSelectorElement.register();
-
     const app = new CurrencyManagementApp({actor});
-    app.render(true);
+    void app.render(true);
 
     return app;
   }
